@@ -313,6 +313,22 @@ button:disabled {
   white-space: nowrap;
 }
 
+.search-toolbar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  padding: 14px 16px 0;
+}
+
+.search-field {
+  gap: 8px;
+}
+
+.search-field span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
 .set-list {
   display: grid;
   gap: 8px;
@@ -392,6 +408,60 @@ button:disabled {
   padding: 20px;
   background:
     linear-gradient(180deg, #ffffff 0%, #f9fbff 100%);
+}
+
+.module-brief-card {
+  padding: 16px 18px;
+  background: linear-gradient(180deg, #fcfdff 0%, #f6f9ff 100%);
+}
+
+.module-brief-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.module-brief-head strong {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 15px;
+}
+
+.module-brief-head p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.brief-tag {
+  display: inline-flex;
+  align-items: center;
+  height: 24px;
+  padding: 0 10px;
+  color: var(--primary);
+  background: rgba(22, 119, 255, 0.08);
+  border: 1px solid rgba(22, 119, 255, 0.16);
+  border-radius: 999px;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.module-brief-points {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.module-brief-points span {
+  min-height: 52px;
+  padding: 12px 14px;
+  color: #344054;
+  background: #fff;
+  border: 1px solid #e7eef8;
+  border-radius: 6px;
+  line-height: 1.6;
 }
 
 .set-title-row {
@@ -707,6 +777,133 @@ code {
   color: var(--muted);
   line-height: 1.6;
   font-size: 13px;
+}
+
+.guide-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(320px, 0.95fr);
+  gap: 16px;
+}
+
+.guide-hero-body {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  padding: 18px;
+}
+
+.guide-highlight {
+  padding: 16px;
+  background: linear-gradient(180deg, #ffffff 0%, #f7fbff 100%);
+  border: 1px solid #e7eef8;
+  border-radius: 8px;
+}
+
+.guide-highlight strong,
+.guide-block strong,
+.interaction-card strong {
+  display: block;
+  margin-bottom: 8px;
+}
+
+.guide-highlight p,
+.guide-block li,
+.interaction-card li,
+.planning-row span {
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.flow-steps {
+  display: grid;
+  gap: 12px;
+  padding: 18px;
+}
+
+.flow-step {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr);
+  gap: 14px;
+  padding: 14px 16px;
+  background: #fbfcff;
+  border: 1px solid #e9eef7;
+  border-radius: 8px;
+}
+
+.flow-step-index {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  color: var(--primary);
+  background: rgba(22, 119, 255, 0.08);
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.flow-step strong {
+  display: block;
+  margin-bottom: 6px;
+}
+
+.flow-step p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.guide-blocks,
+.interaction-grid {
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+}
+
+.guide-block,
+.interaction-card {
+  padding: 16px;
+  background: #fff;
+  border: 1px solid #e7edf6;
+  border-radius: 8px;
+}
+
+.guide-block ul,
+.interaction-card ul {
+  padding-left: 18px;
+  margin: 0;
+}
+
+.interaction-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.planning-table {
+  padding: 0 18px 18px;
+}
+
+.planning-row {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  gap: 16px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.planning-row:last-child {
+  border-bottom: 0;
+}
+
+.planning-head {
+  padding-top: 18px;
+  color: #475467;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.planning-head span {
+  color: #475467;
 }
 
 .empty-state {
@@ -1030,12 +1227,20 @@ code {
   }
 
   .principle-grid,
+  .guide-hero-body,
+  .guide-grid,
+  .interaction-grid,
   .master-detail {
     grid-template-columns: 1fr;
   }
 
   .set-info-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .module-brief-points,
+  .planning-row {
+    grid-template-columns: 1fr;
   }
 
   .master-pane {
@@ -1050,7 +1255,8 @@ code {
   .button-row,
   .context-card,
   .context-actions,
-  .selected-set-card {
+  .selected-set-card,
+  .module-brief-head {
     align-items: stretch;
     flex-direction: column;
   }

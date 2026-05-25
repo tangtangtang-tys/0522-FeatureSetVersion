@@ -1,5 +1,6 @@
 const navItems = [
   { id: "featureSets", label: "功能集管理" },
+  { id: "guide", label: "流程与交互说明" },
   { id: "standards", label: "字段规范" }
 ];
 
@@ -187,6 +188,7 @@ const importTemplate = `JSON 格式:
 let activePage = "featureSets";
 let selectedFeatureSetId = "fs-network";
 let versionView = "versions";
+let featureSetKeyword = "";
 
 const $ = (selector) => document.querySelector(selector);
 const els = {
@@ -242,14 +244,18 @@ function render() {
   els.title.textContent = navItems.find((item) => item.id === activePage)?.label || "功能集管理";
   if (activePage !== "featureSets") closeDrawer();
   if (activePage === "featureSets") renderFeatureSets();
+  if (activePage === "guide") renderGuide();
   if (activePage === "standards") renderStandards();
 }
 
 function renderFeatureSets() {
-  const currentSet = featureSets.find((item) => item.id === selectedFeatureSetId) || featureSets[0] || null;
+  const filteredSets = filterFeatureSets(featureSets, featureSetKeyword);
+  const currentSet = filteredSets.find((item) => item.id === selectedFeatureSetId) || filteredSets[0] || null;
   selectedFeatureSetId = currentSet?.id || "";
   const currentVersions = currentSet ? versions.filter((item) => item.featureSetId === currentSet.id) : [];
   const currentLogs = currentSet ? operationLogs.filter((item) => item.featureSetId === currentSet.id) : [];
+  const isSearching = Boolean(featureSetKeyword.trim());
+  const totalText = isSearching ? `匹配 ${filteredSets.length} 项，共 ${featureSets.length} 项` : `共 ${featureSets.length} 项`;
 
   els.content.innerHTML = `
     <section class="master-detail">
@@ -257,17 +263,19 @@ function renderFeatureSets() {
         <div class="card-header compact-header">
           <div>
             <h3>功能集列表</h3>
-            <p>共 ${featureSets.length} 项</p>
+            <p>${totalText}</p>
           </div>
           <button class="primary-action" type="button" data-action="create-set">新增功能集</button>
         </div>
-        ${featureSetList(featureSets)}
+        ${searchToolbar()}
+        ${featureSetList(filteredSets, featureSetKeyword)}
       </aside>
 
       <article class="detail-pane">
         ${
           currentSet
             ? `
+              ${moduleBrief(currentSet)}
               ${selectedSetHeader(currentSet, currentVersions)}
               <section class="page-card version-workbench">
                 <div class="card-header">
@@ -283,9 +291,130 @@ function renderFeatureSets() {
                 ${versionView === "versions" ? versionTable(currentVersions) : operationLogTable(currentLogs)}
               </section>
             `
-            : `<section class="page-card empty-detail-card">${emptyState("暂无功能集", "请先新增功能集，再维护对应的版本记录。")}</section>`
+            : `<section class="page-card empty-detail-card">${emptyState(isSearching ? "未找到匹配功能集" : "暂无功能集", isSearching ? `未匹配到名称或编码包含“${escapeHtml(featureSetKeyword)}”的功能集，请调整关键词后重试。` : "请先新增功能集，再维护对应的版本记录。")}</section>`
         }
       </article>
+    </section>
+  `;
+
+  const searchInput = $("#featureSetSearch");
+  if (searchInput) {
+    searchInput.addEventListener("input", (event) => {
+      featureSetKeyword = event.target.value;
+      renderFeatureSets();
+    });
+  }
+}
+
+function renderGuide() {
+  els.content.innerHTML = `
+    <section class="page-card guide-hero">
+      <div class="card-header guide-header">
+        <div>
+          <h3>流程与交互说明</h3>
+          <p>本页用于说明功能集管理模块在当前 MVP 阶段的使用路径、模块职责以及与后续平台规划之间的承接关系。</p>
+        </div>
+      </div>
+      <div class="guide-hero-body">
+        ${guideHighlight("当前定位", "作为机型能力治理的 MVP 工作台，先完成“定义功能集 - 维护版本 - 留痕追溯”的最小闭环。")}
+        ${guideHighlight("当前覆盖", "功能集管理、版本记录、操作日志、批量导入、字段规范与名称/编码查询。")}
+        ${guideHighlight("后续承接", "未来可继续扩展机型绑定、软件版本映射、测试验收和跨角色审批，但本轮先用说明页完成关系表达。")}
+      </div>
+    </section>
+
+    <section class="guide-grid">
+      <section class="page-card">
+        <div class="card-header">
+          <div>
+            <h3>整体流程闭环</h3>
+            <p>围绕“先定义，再沉淀，再发布，再追溯”的管理路径梳理当前模块如何协同。</p>
+          </div>
+        </div>
+        <div class="flow-steps">
+          ${flowStep("01", "定义功能集", "产品或平台运营新建功能集，明确名称、编码、状态和边界说明，形成一个可持续维护的能力容器。")}
+          ${flowStep("02", "维护版本草稿", "在对应功能集下新增版本，填写版本号、版本名称、支持能力和版本描述，先保存为草稿。")}
+          ${flowStep("03", "发布可引用版本", "确认能力范围后发布版本，形成可对外引用的能力快照，同时记录发布时间。")}
+          ${flowStep("04", "查看操作留痕", "通过操作日志查看创建、保存、发布等关键动作，为后续问题定位和版本回溯提供依据。")}
+          ${flowStep("05", "批量导入补录", "对于历史能力或成批迁移场景，可通过模板一次性导入功能集及版本数据。")}
+          ${flowStep("06", "进入后续规划", "当前 MVP 完成最小治理闭环；后续可在此基础上继续承接机型绑定、软件版本映射和测试验收。")}
+        </div>
+      </section>
+
+      <section class="page-card">
+        <div class="card-header">
+          <div>
+            <h3>模块职责说明</h3>
+            <p>明确当前导航模块各自解决什么问题，避免页面职责交叉。</p>
+          </div>
+        </div>
+        <div class="guide-blocks">
+          ${guideBlock("功能集管理", [
+            "用于进行日常操作，主路径是查询功能集、查看详情、维护版本和查看日志。",
+            "功能集负责表达能力边界，不直接承载某一版的具体能力值。",
+            "版本记录负责沉淀某一时间点可被引用的能力快照。"
+          ])}
+          ${guideBlock("流程与交互说明", [
+            "用于向产品、研发、测试、交付等角色解释当前模块的定位、流程和使用方式。",
+            "本页会同时区分“当前已实现能力”和“后续规划承接关系”。",
+            "适合作为评审、汇报和新人上手时的统一口径。"
+          ])}
+          ${guideBlock("字段规范", [
+            "用于统一字段命名、必填口径和填写示例。",
+            "当前只覆盖 MVP 已落地字段，避免在页面中提前承载未实现的数据模型。",
+            "后续新增模型时可按同样方式扩充规范内容。"
+          ])}
+        </div>
+      </section>
+    </section>
+
+    <section class="page-card">
+      <div class="card-header">
+        <div>
+          <h3>模块交互说明</h3>
+          <p>将当前页面中的核心交互行为统一口径，便于后续继续扩展时保持一致。</p>
+        </div>
+      </div>
+      <div class="interaction-grid">
+        ${interactionCard("功能集查询", [
+          "查询位置在功能集列表上方，只支持按功能集名称和功能集编码检索。",
+          "输入后实时筛选列表，无需额外点击查询按钮。",
+          "若当前选中项仍在结果中，右侧详情保持；若被筛掉，则自动切换到第一条匹配结果。"
+        ])}
+        ${interactionCard("新增/编辑功能集", [
+          "通过弹窗完成录入，字段包含名称、编码、状态和说明。",
+          "状态使用开关形式交互，鼠标移入提示图标可查看状态影响。",
+          "取消、关闭按钮和点击遮罩均应真正关闭弹窗，不保留残留内容。"
+        ])}
+        ${interactionCard("版本记录管理", [
+          "版本记录默认展示版本列表，可切换到操作日志查看行为留痕。",
+          "新增版本时先保存草稿，再根据需要发布，避免未确认内容直接成为正式快照。",
+          "已发布版本支持查看和编辑；草稿版本支持编辑、发布和删除。"
+        ])}
+        ${interactionCard("批量导入", [
+          "入口保留在页面顶部，用于处理历史能力补录和批量迁移。",
+          "通过模板说明约束字段结构，减少导入时口径不一致。",
+          "当前为 MVP 原型交互，后续可扩展为上传校验、错误提示和导入结果反馈。"
+        ])}
+      </div>
+    </section>
+
+    <section class="page-card">
+      <div class="card-header">
+        <div>
+          <h3>与后续规划的关系</h3>
+          <p>基于初版需求文档，将本轮 MVP 页面与未来平台化能力之间的关系先说清楚。</p>
+        </div>
+      </div>
+      <div class="planning-table">
+        <div class="planning-row planning-head">
+          <span>后续能力方向</span>
+          <span>当前 MVP 承接方式</span>
+        </div>
+        ${planningRow("机型功能集绑定", "当前先用功能集 + 版本快照表达能力基线，后续再将功能集版本与机型、SKU、区域、项目建立绑定关系。")}
+        ${planningRow("软件版本映射", "当前只管理能力定义和版本发布，后续可补充固件、App、云平台、算法包的实现版本映射。")}
+        ${planningRow("测试与验收", "当前通过版本记录和操作日志保留发布依据，后续可继续扩展测试范围、用例和验收结论。")}
+        ${planningRow("审批与审计", "当前保留操作日志作为留痕基础，后续可增加评审、冻结、发布审批和引用校验。")}
+      </div>
     </section>
   `;
 }
@@ -309,8 +438,20 @@ function renderStandards() {
   `;
 }
 
-function featureSetList(rows) {
-  if (!rows.length) return emptyState("暂无功能集", "点击新增功能集，先定义能力边界。");
+function searchToolbar() {
+  return `
+    <div class="search-toolbar">
+      <label class="search-field">
+        <span>功能集查询</span>
+        <input id="featureSetSearch" type="search" placeholder="按功能集名称或编码检索" value="${escapeAttr(featureSetKeyword)}" />
+      </label>
+      <button class="ghost-action" type="button" data-action="clear-search" ${featureSetKeyword ? "" : "disabled"}>清空</button>
+    </div>
+  `;
+}
+
+function featureSetList(rows, keyword = "") {
+  if (!rows.length) return emptyState(keyword ? "未找到匹配功能集" : "暂无功能集", keyword ? `没有匹配“${escapeHtml(keyword)}”的名称或编码。` : "点击新增功能集，先定义能力边界。");
   return `
     <div class="set-list">
       ${rows
@@ -332,6 +473,25 @@ function featureSetList(rows) {
         })
         .join("")}
     </div>
+  `;
+}
+
+function moduleBrief(item) {
+  return `
+    <section class="page-card module-brief-card">
+      <div class="module-brief-head">
+        <div>
+          <strong>模块摘要</strong>
+          <p>当前正在查看“${item.name}”的能力边界与版本沉淀情况。</p>
+        </div>
+        <span class="brief-tag">MVP 范围</span>
+      </div>
+      <div class="module-brief-points">
+        <span>功能集负责定义能力边界与维护口径</span>
+        <span>版本记录负责沉淀可发布、可追溯的能力快照</span>
+        <span>操作日志负责留痕关键动作，便于后续回溯</span>
+      </div>
+    </section>
   `;
 }
 
@@ -507,10 +667,66 @@ function principle(title, text) {
   `;
 }
 
+function guideHighlight(title, text) {
+  return `
+    <article class="guide-highlight">
+      <strong>${title}</strong>
+      <p>${text}</p>
+    </article>
+  `;
+}
+
+function flowStep(index, title, text) {
+  return `
+    <article class="flow-step">
+      <span class="flow-step-index">${index}</span>
+      <div>
+        <strong>${title}</strong>
+        <p>${text}</p>
+      </div>
+    </article>
+  `;
+}
+
+function guideBlock(title, items) {
+  return `
+    <article class="guide-block">
+      <strong>${title}</strong>
+      <ul>
+        ${items.map((item) => `<li>${item}</li>`).join("")}
+      </ul>
+    </article>
+  `;
+}
+
+function interactionCard(title, items) {
+  return `
+    <article class="interaction-card">
+      <strong>${title}</strong>
+      <ul>
+        ${items.map((item) => `<li>${item}</li>`).join("")}
+      </ul>
+    </article>
+  `;
+}
+
+function planningRow(title, text) {
+  return `
+    <div class="planning-row">
+      <strong>${title}</strong>
+      <span>${text}</span>
+    </div>
+  `;
+}
+
 function handleAction(action, id) {
   if (action === "select-set") {
     selectedFeatureSetId = id;
     render();
+  }
+  if (action === "clear-search") {
+    featureSetKeyword = "";
+    renderFeatureSets();
   }
   if (action === "switch-version-view") {
     versionView = id;
@@ -838,6 +1054,16 @@ function nextVersionNo(featureSetId) {
 function latestVersionNo(setVersions) {
   if (!setVersions.length) return "-";
   return setVersions.reduce((latest, item) => (parseVersionMajor(item.versionNo) > parseVersionMajor(latest.versionNo) ? item : latest), setVersions[0]).versionNo;
+}
+
+function filterFeatureSets(rows, keyword) {
+  const normalized = String(keyword || "").trim().toLowerCase();
+  if (!normalized) return rows;
+  return rows.filter((item) => {
+    const name = item.name.toLowerCase();
+    const code = item.code.toLowerCase();
+    return name.includes(normalized) || code.includes(normalized);
+  });
 }
 
 function parseVersionMajor(versionNo = "") {
