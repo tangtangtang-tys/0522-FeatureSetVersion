@@ -1,6 +1,7 @@
 const navItems = [
   { id: "featureSets", label: "功能集管理" },
   { id: "guide", label: "流程与交互说明" },
+  { id: "prd", label: "产品需求文档" },
   { id: "standards", label: "字段规范" }
 ];
 
@@ -185,10 +186,580 @@ const importTemplate = `JSON 格式:
   ]
 }`;
 
+const prdSections = [
+  {
+    id: "prd-overview",
+    title: "01 文档概述",
+    intro: "说明文档的目的、定位和适用范围，明确这份 PRD 既用于内部评审，也用于阶段汇报与后续建设基线管理。",
+    blocks: [
+      {
+        type: "definition",
+        items: [
+          ["文档名称", "机型功能集版本管理平台产品需求文档（PRD）"],
+          ["文档目的", "统一平台的背景、目标、范围、流程、功能需求、非功能需求与阶段规划。"],
+          ["文档定位", "兼顾可评审与可汇报，既服务研发落地，也支撑平台立项与阶段规划沟通。"],
+          ["适用范围", "覆盖当前 MVP 功能集管理模块、一期平台建设范围及长期路线图。"] 
+        ]
+      }
+    ]
+  },
+  {
+    id: "prd-background",
+    title: "02 背景概述与问题定义",
+    intro: "从摄像机 IoT 产品线的实际协同痛点出发，说明为什么需要从研发工具升级为跨角色能力治理平台。",
+    blocks: [
+      {
+        type: "bullets",
+        title: "当前主要问题",
+        items: [
+          "功能项已被维护，但产品承诺视角不足，难以形成完整可售卖、可交付的能力包。",
+          "功能项可以演进，但缺少功能集整体版本基线，无法回答某机型某版本到底支持什么。",
+          "数据维护动作已存在，但缺少从需求引入到发布追溯的完整流程闭环。",
+          "角色协同不足，产品、研发、测试、售前、售后尚未统一到同一能力事实源。",
+          "当前字段结构偏自然语言，长期难以支撑自动化测试、版本映射和依赖分析。"
+        ]
+      },
+      {
+        type: "highlight",
+        title: "核心问题定义",
+        text: "需要建立一个可规划、可维护、可发布、可追溯的机型能力治理平台，使摄像机产品线能够围绕“功能集”和“功能集版本”形成统一的产品定义语言，并支撑多角色协同与分阶段扩展。"
+      }
+    ]
+  },
+  {
+    id: "prd-goals",
+    title: "03 产品目标与成功指标",
+    intro: "明确平台建设的业务目标与分阶段成功标准，避免需求只停留在页面功能层。",
+    blocks: [
+      {
+        type: "cards",
+        title: "产品目标",
+        items: [
+          ["建立能力定义的统一事实源", "将功能项、功能集、功能集版本从分散字段、临时表格和人员经验中抽离出来，形成结构化能力资产。"],
+          ["建立版本治理与能力追溯机制", "通过功能集版本固化对外可承诺、对内可交付的能力快照。"],
+          ["建立跨角色协同的最小治理闭环", "围绕需求引入、功能定义、功能集编排、版本沉淀、发布与日志追溯形成闭环。"]
+        ]
+      },
+      {
+        type: "timeline",
+        title: "成功指标",
+        items: [
+          ["MVP", "100% 的新建功能集与功能集版本通过平台录入；查询功能集到版本记录的平均操作路径不超过 3 步。"],
+          ["一期", "80% 以上的标准机型能力定义通过功能集版本管理；跨角色问题确认的人工确认次数明显下降。"],
+          ["长期", "平台成为机型能力定义、版本映射与发布追溯的统一事实源。"]
+        ]
+      }
+    ]
+  },
+  {
+    id: "prd-scope",
+    title: "04 需求范围与非目标",
+    intro: "区分当前 MVP、一期与长期平台范围，避免开发阶段边界模糊。",
+    blocks: [
+      {
+        type: "columns",
+        title: "建设范围",
+        columns: [
+          {
+            heading: "当前 MVP",
+            items: [
+              "功能集列表展示与查询",
+              "新增、编辑、启停功能集",
+              "功能集详情查看",
+              "版本记录、操作日志、批量导入",
+              "字段规范页与流程说明页"
+            ]
+          },
+          {
+            heading: "一期范围",
+            items: [
+              "功能项字典结构化管理",
+              "功能集与功能项关系编排",
+              "版本状态机",
+              "评审记录、引用校验、历史版本对比"
+            ]
+          },
+          {
+            heading: "长期平台",
+            items: [
+              "机型功能集绑定",
+              "软件版本映射",
+              "测试与验收",
+              "多角色权限体系与定制转标准治理"
+            ]
+          }
+        ]
+      },
+      {
+        type: "bullets",
+        title: "非目标",
+        items: [
+          "当前不要求完成完整的机型、SKU、区域、项目绑定页。",
+          "当前不要求完成固件、App、云平台版本映射页。",
+          "当前不要求建设自动化测试平台或大屏驾驶舱式统计页。",
+          "当前不要求落完整审批流引擎与 BI 分析模块。"
+        ]
+      }
+    ]
+  },
+  {
+    id: "prd-roles",
+    title: "05 用户角色与典型场景",
+    intro: "明确平台面向的角色及其使用场景，避免功能只服务单一角色。",
+    blocks: [
+      {
+        type: "cards",
+        title: "核心用户角色",
+        items: [
+          ["产品经理", "关注能力边界、版本规划、对外承诺和阶段节奏。"],
+          ["研发人员", "关注字段定义、实现边界、兼容性、版本依赖和历史追溯。"],
+          ["测试人员", "关注版本范围、验收基线和变更影响。"],
+          ["售前 / 销售", "关注机型卖点、能力差异和可承诺范围。"],
+          ["交付 / 售后", "关注项目版本、设备能力判断、历史追溯和升级说明。"]
+        ]
+      },
+      {
+        type: "numbered",
+        title: "典型使用场景",
+        items: [
+          "产品经理为新产品线定义功能集，并沉淀多个能力版本。",
+          "研发确认某功能集在不同版本间的能力变化。",
+          "测试根据某功能集版本确定当前测试范围。",
+          "售前确认某机型在某版本下是否支持某项能力。",
+          "售后通过操作日志与版本记录回溯某次能力变更。"
+        ]
+      }
+    ]
+  },
+  {
+    id: "prd-flow",
+    title: "06 产品整体流程",
+    intro: "平台建设围绕需求引入、能力定义、版本沉淀、发布追溯与后续映射展开。",
+    blocks: [
+      {
+        type: "timeline",
+        title: "总体业务闭环",
+        items: [
+          ["01", "需求引入"],
+          ["02", "能力定义"],
+          ["03", "功能集编排"],
+          ["04", "版本沉淀"],
+          ["05", "版本发布"],
+          ["06", "能力追溯"],
+          ["07", "后续映射与验证"]
+        ]
+      },
+      {
+        type: "numbered",
+        title: "MVP 主流程",
+        items: [
+          "创建功能集并填写基础信息。",
+          "选择目标功能集进入版本管理。",
+          "创建版本草稿并保存。",
+          "发布可引用版本。",
+          "查看版本列表与日志记录。"
+        ]
+      }
+    ]
+  },
+  {
+    id: "prd-diagrams",
+    title: "07 交互流程图",
+    intro: "以研发易查阅的文本流程图方式，明确关键操作路径和状态变化。",
+    blocks: [
+      {
+        type: "diagram",
+        title: "功能集创建与版本发布流程",
+        text: `[进入功能集管理页]
+        |
+        v
+[查看功能集列表]
+        |
+        +--------------------+
+        |                    |
+        v                    v
+[新增功能集]            [选择已有功能集]
+        |                    |
+        v                    v
+[填写名称/编码/状态/说明]   [查看功能集详情]
+        |                    |
+        v                    v
+[保存功能集]            [进入版本记录]
+        |                    |
+        +-----------> [新增版本]
+                           |
+                           v
+               [填写版本号/版本名称/支持能力/版本描述]
+                           |
+                  +--------+--------+
+                  |                 |
+                  v                 v
+              [保存草稿]         [直接发布]
+                  |                 |
+                  v                 v
+              [留存草稿]         [形成已发布版本]
+                  |                 |
+                  +--------+--------+
+                           |
+                           v
+                      [查看版本列表]
+                           |
+                           v
+                      [查看操作日志]`
+      },
+      {
+        type: "diagram",
+        title: "查询流程",
+        text: `[进入功能集管理页]
+        |
+        v
+[在查询区输入名称/编码关键词]
+        |
+        +----------------------+
+        |                      |
+        v                      v
+[点击搜索/按Enter]        [点击重置]
+        |                      |
+        v                      v
+[筛选左侧功能集列表]      [恢复全部列表]
+        |
+        v
+[若当前选中项仍存在 -> 保持详情]
+[若当前选中项不存在 -> 自动切换第一条匹配项]
+        |
+        v
+[若无匹配结果 -> 列表和详情显示空状态]`
+      },
+      {
+        type: "diagram",
+        title: "批量导入流程",
+        text: `[点击批量导入]
+        |
+        v
+[查看导入模板说明]
+        |
+        v
+[上传或拖入JSON文件]
+        |
+        v
+[提交导入任务]
+        |
+        v
+[平台执行导入]
+        |
+        v
+[导入结果反馈（MVP阶段可先保留原型提示）]`
+      }
+    ]
+  },
+  {
+    id: "prd-functional",
+    title: "08 功能性需求",
+    intro: "从研发视角拆分当前 MVP 已落地模块，明确每一类功能的需求说明与验收标准。",
+    blocks: [
+      {
+        type: "functional-groups",
+        groups: [
+          {
+            title: "模块一：功能集管理",
+            items: [
+              ["功能集列表", "展示功能集名称、编码、状态、版本记录数量、最新版本号；点击列表项联动右侧详情。"],
+              ["功能集查询", "支持按功能集名称和编码查询；点击查询或按 Enter 执行；点击重置恢复全部列表。"],
+              ["新增功能集", "通过弹窗录入名称、编码、状态和说明；保存成功后自动选中新建功能集。"],
+              ["编辑功能集", "支持修改既有功能集的基础信息与启停状态。"],
+              ["删除功能集", "若已有关联版本，则默认禁止删除并给出提示。"]
+            ]
+          },
+          {
+            title: "模块二：功能集版本管理",
+            items: [
+              ["版本记录列表", "展示版本号、版本名称、支持能力、版本描述、状态、发布时间和操作。"],
+              ["新增版本", "通过弹窗录入版本号、版本名称、支持能力和版本描述。"],
+              ["保存草稿", "允许先保存为草稿，后续再发布。"],
+              ["发布版本", "将版本草稿发布为正式版本，并写入发布时间。"],
+              ["查看与编辑版本", "支持只读查看与编辑修改；已发布版本也可继续编辑。"],
+              ["删除版本", "草稿版本支持删除，已发布版本默认不可直接删除。"]
+            ]
+          },
+          {
+            title: "模块三：操作日志",
+            items: [
+              ["操作日志展示", "展示操作时间、操作类型、操作对象、操作人和处理结果，内容与当前功能集保持关联。"]
+            ]
+          },
+          {
+            title: "模块四：批量导入",
+            items: [
+              ["导入入口", "页面顶部提供统一入口。"],
+              ["导入模板说明", "弹窗中展示 JSON 模板与字段结构。"],
+              ["导入提交", "支持上传或拖拽文件并提交，MVP 阶段可先保留原型提示。"]
+            ]
+          },
+          {
+            title: "模块五：字段规范与说明页",
+            items: [
+              ["字段规范", "展示当前已落地字段的命名、口径和填写示例。"],
+              ["流程与交互说明", "独立页面说明模块定位、流程闭环、交互规则和后续规划关系。"]
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: "prd-nonfunctional",
+    title: "09 非功能性需求",
+    intro: "确保平台不仅能用，还具备可维护、可协同、可扩展的基础质量。",
+    blocks: [
+      {
+        type: "cards",
+        title: "非功能性要求",
+        items: [
+          ["可用性", "页面路径清晰，列表、详情、版本、日志四层关系明确，空状态和错误提示完整。"],
+          ["可维护性", "前端结构需支持后续扩展新模块，功能集、版本、日志等对象保持清晰分层。"],
+          ["一致性", "状态标签、按钮、卡片、表格、弹窗交互风格一致，文案口径统一。"],
+          ["性能", "在当前原型阶段，列表切换与查询无明显卡顿；后续真实系统需保证常见数据量下快速返回。"],
+          ["安全与权限", "删除、发布等关键动作需具备权限控制预留，日志数据支持审计留痕扩展。"],
+          ["兼容与响应式", "桌面端优先，窄屏下保持结构不破碎。"]
+        ]
+      }
+    ]
+  },
+  {
+    id: "prd-data",
+    title: "10 数据对象与关键字段",
+    intro: "为研发理解当前模型与后续扩展对象提供统一口径。",
+    blocks: [
+      {
+        type: "cards",
+        title: "当前 MVP 核心对象",
+        items: [
+          ["功能集 FeatureSet", "id、name、code、status、description、createdAt、updatedAt"],
+          ["功能集版本 FeatureSetVersion", "id、featureSetId、versionNo、versionName、supportedCapability、description、status、publishedAt、createdAt"],
+          ["操作日志 OperationLog", "id、featureSetId、action、target、operator、operatedAt、result"]
+        ]
+      },
+      {
+        type: "bullets",
+        title: "一期及长期扩展对象",
+        items: [
+          "功能项 Feature / 功能项取值 FeatureValue",
+          "功能集版本明细 FeatureSetVersionItem",
+          "机型 Model / SKU / 硬件平台 HardwarePlatform",
+          "软件版本 SoftwareVersion / 版本映射 VersionMapping",
+          "测试用例 TestCase / 测试结果 TestResult",
+          "审批记录 ApprovalRecord / 变更申请 ChangeRequest"
+        ]
+      }
+    ]
+  },
+  {
+    id: "prd-collaboration",
+    title: "11 权限与角色协同",
+    intro: "当前阶段先统一协同原则，后续逐步升级为权限模型。",
+    blocks: [
+      {
+        type: "columns",
+        title: "当前协同原则与后续权限方向",
+        columns: [
+          {
+            heading: "当前角色协同原则",
+            items: [
+              "产品负责能力定义与版本规划",
+              "研发负责字段、能力与实现边界确认",
+              "测试负责版本范围与验证依据确认",
+              "售前/销售负责能力查询与对外口径使用",
+              "售后/交付负责历史版本追溯与能力核对"
+            ]
+          },
+          {
+            heading: "后续权限方向",
+            items: [
+              "查看权限",
+              "编辑权限",
+              "发布权限",
+              "删除/归档权限",
+              "审批权限",
+              "审计查看权限"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: "prd-risks",
+    title: "12 风险、依赖与约束",
+    intro: "提前识别平台化过程中容易出现的边界问题与组织依赖。",
+    blocks: [
+      {
+        type: "bullets",
+        title: "关键风险",
+        items: [
+          "功能项、功能集、版本三类概念边界不清，可能导致平台定义混乱。",
+          "若无统一字段结构化建模，后续扩展到机型绑定和版本映射会出现重构成本。",
+          "若删除与发布没有审计与引用校验，将影响追溯链路完整性。",
+          "若平台只服务研发视角，将无法成为真正的跨角色能力事实源。"
+        ]
+      },
+      {
+        type: "bullets",
+        title: "关键依赖与当前约束",
+        items: [
+          "依赖产品侧统一功能定义口径、研发侧统一字段编码与数据结构约束。",
+          "依赖测试侧明确版本验证边界，以及后续机型、软件版本、项目与测试数据的接入配合。",
+          "当前系统仍处于 MVP 原型阶段，需要同时兼顾短期落地与长期平台规划。"
+        ]
+      }
+    ]
+  },
+  {
+    id: "prd-roadmap",
+    title: "13 分阶段路线图",
+    intro: "将当前 MVP、一期建设与长期平台化方向拆开表达，方便评审与汇报。",
+    blocks: [
+      {
+        type: "timeline",
+        title: "阶段路线图",
+        items: [
+          ["MVP", "完成功能集管理、版本记录、操作日志、批量导入、查询、字段规范与流程说明的最小治理闭环。"],
+          ["一期", "补齐功能项字典、功能集与功能项关系、版本状态机、评审冻结、引用校验和历史版本对比。"],
+          ["二期", "扩展机型功能集绑定、SKU/区域/项目关联及软件版本映射。"],
+          ["三期", "建设测试与验收、审批与审计、多机型对比和项目定制转标准能力治理。"]
+        ]
+      }
+    ]
+  },
+  {
+    id: "prd-acceptance",
+    title: "14 验收标准",
+    intro: "从平台能力、产品目标和文档完整性三个维度定义本轮 PRD 的验收标准。",
+    blocks: [
+      {
+        type: "columns",
+        title: "验收标准",
+        columns: [
+          {
+            heading: "当前 MVP 验收",
+            items: [
+              "支持新增、编辑、启停功能集",
+              "支持查询功能集名称与编码",
+              "支持新增版本、保存草稿、发布版本",
+              "支持查看版本列表与操作日志",
+              "支持批量导入入口、字段规范页与流程说明页"
+            ]
+          },
+          {
+            heading: "产品层验收",
+            items: [
+              "能够清晰区分功能集定义与功能集版本",
+              "能够回答当前功能集有哪些版本、最新版本是什么",
+              "能够留存关键操作日志",
+              "能够为后续机型绑定、软件版本映射与测试验收预留清晰承接关系"
+            ]
+          },
+          {
+            heading: "文档层验收",
+            items: [
+              "背景、目标、范围、流程、功能需求、非功能需求完整",
+              "当前阶段与后续阶段边界明确",
+              "可同时用于需求评审与立项汇报"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+];
+
 let activePage = "featureSets";
 let selectedFeatureSetId = "fs-network";
 let versionView = "versions";
 let featureSetKeyword = "";
+let activeAnnotationId = "";
+
+const annotationItems = [
+  {
+    id: "01",
+    anchor: "query",
+    scene: "用于快速定位目标功能集，适合功能集数量增加后的日常筛选场景。",
+    title: "功能集查询",
+    trigger: "输入功能集名称或功能集编码后，点击“查询”或按 Enter。",
+    fields: "功能集名称、功能集编码。",
+    interaction: "执行后刷新左侧功能集列表，并根据结果联动右侧详情与版本记录区域。",
+    result: "若当前选中项仍在结果内则保持选中；若不存在则自动切换到第一条匹配项；无结果时展示空状态。"
+  },
+  {
+    id: "02",
+    anchor: "create-set",
+    scene: "用于新增一个可持续维护的能力容器，适合新建能力域或补录历史功能集。",
+    title: "新增功能集",
+    trigger: "点击“新增功能集”按钮。",
+    fields: "功能集名称、功能集编码、功能集状态、功能集说明。",
+    interaction: "点击后打开新增功能集弹窗，录入基础信息后保存。",
+    result: "名称、编码、说明必填；状态默认启用；保存成功后新建项进入左侧列表并自动成为当前选中功能集。"
+  },
+  {
+    id: "03",
+    anchor: "set-list",
+    scene: "用于在多个功能集之间快速切换，查看不同能力边界下的详情和版本。",
+    title: "功能集列表",
+    trigger: "点击左侧任一功能集列表项。",
+    fields: "展示功能集名称、功能集编码、状态、版本数量、最新版本。",
+    interaction: "点击后切换当前选中功能集，并同步更新右侧详情卡、版本列表与操作日志视图。",
+    result: "查询后若当前选中项仍匹配则保留；若不匹配则自动切换第一条结果；无匹配时右侧同步显示空状态。"
+  },
+  {
+    id: "04",
+    anchor: "set-actions",
+    scene: "用于维护当前功能集的基础信息与状态，适合日常修订和治理操作。",
+    title: "功能集详情操作",
+    trigger: "点击编辑、启用/停用、删除按钮。",
+    fields: "编辑时可维护功能集名称、编码、状态、说明；状态支持启用/停用。",
+    interaction: "编辑会打开弹窗；启停为即时切换；删除前会先做可删除性判断。",
+    result: "停用后仅保留展示；若功能集下已有版本记录则禁止删除；编辑保存后详情信息与列表状态同步更新。"
+  },
+  {
+    id: "05",
+    anchor: "view-switch",
+    scene: "用于在版本沉淀记录和关键操作留痕之间切换查看当前功能集的管理信息。",
+    title: "版本视图切换",
+    trigger: "点击“版本列表”或“操作日志”页签。",
+    fields: "当前操作无字段录入。",
+    interaction: "只切换右侧工作区展示内容，不改变当前功能集，也不影响左侧列表选择。",
+    result: "版本列表用于查看版本沉淀内容；操作日志用于查看创建、保存、发布等关键动作留痕。"
+  },
+  {
+    id: "06",
+    anchor: "create-version",
+    scene: "用于在当前功能集下沉淀新的能力快照，适合新增迭代版本或补录历史版本。",
+    title: "新增版本",
+    trigger: "点击“新增版本”按钮。",
+    fields: "版本号、版本名称、支持能力、版本描述。",
+    interaction: "点击后打开版本弹窗，可选择先保存草稿，也可直接发布。",
+    result: "字段全部必填；保存后形成草稿版本；发布后形成正式版本并写入发布时间。"
+  },
+  {
+    id: "07",
+    anchor: "version-actions",
+    scene: "用于对已有版本记录进行查看、修订、发布或清理，适合版本治理和历史维护场景。",
+    title: "版本操作列",
+    trigger: "在版本列表操作列中点击查看、编辑、发布、删除。",
+    fields: "当前操作基于已有版本记录，不新增字段；编辑时可修改版本号、版本名称、支持能力、版本描述。",
+    interaction: "已发布版本支持查看和编辑；草稿版本支持编辑、发布与删除；不同状态显示不同操作集合。",
+    result: "已发布版本不可直接删除；草稿版本可删除；发布后版本状态更新为已发布并写入发布时间。"
+  },
+  {
+    id: "08",
+    anchor: "bulk-import",
+    scene: "适用于历史数据初始化、批量迁移或一次性补录多个功能集及版本的场景。",
+    title: "批量导入",
+    trigger: "点击页面右上角“批量导入”按钮。",
+    fields: "功能集编码、功能集名称、功能集状态、功能集说明，以及版本号、版本名称、支持能力、版本描述。",
+    interaction: "点击后打开导入弹窗，查看 JSON 模板说明并提交导入任务。",
+    result: "需按模板结构准备数据；当前原型阶段提交后反馈任务已提交，后续可继续扩展真实导入校验。"
+  }
+];
 
 const $ = (selector) => document.querySelector(selector);
 const els = {
@@ -214,6 +785,22 @@ function bindEvents() {
   els.drawerContent.addEventListener("click", handleDrawerClick);
 
   document.addEventListener("click", (event) => {
+    const annotationToggle = event.target.closest("[data-annotation-toggle]");
+    if (annotationToggle) {
+      handleAnnotationToggle(annotationToggle.dataset.annotationToggle);
+      return;
+    }
+
+    if (
+      activeAnnotationId &&
+      !event.target.closest(".annotation-pin") &&
+      !event.target.closest(".annotation-popover")
+    ) {
+      activeAnnotationId = "";
+      render();
+      return;
+    }
+
     const action = event.target.closest("[data-action]");
     if (!action) return;
     handleAction(action.dataset.action, action.dataset.id);
@@ -242,10 +829,26 @@ function renderNav() {
 
 function render() {
   els.title.textContent = navItems.find((item) => item.id === activePage)?.label || "功能集管理";
+  renderTopActions();
   if (activePage !== "featureSets") closeDrawer();
   if (activePage === "featureSets") renderFeatureSets();
   if (activePage === "guide") renderGuide();
+  if (activePage === "prd") renderPrd();
   if (activePage === "standards") renderStandards();
+}
+
+function renderTopActions() {
+  if (activePage !== "featureSets") {
+    els.topActions.innerHTML = "";
+    return;
+  }
+
+  els.topActions.innerHTML = `
+    <div class="annotated-block annotation-align-right">
+      <button class="ghost-action" type="button" data-action="bulk-import">批量导入</button>
+      ${annotationHotspot("bulk-import")}
+    </div>
+  `;
 }
 
 function renderFeatureSets() {
@@ -267,9 +870,15 @@ function renderFeatureSets() {
             <h3>功能集列表</h3>
             <p>${totalText}</p>
           </div>
-          <button class="primary-action" type="button" data-action="create-set">新增功能集</button>
+          <div class="annotated-block annotation-align-right">
+            <button class="primary-action" type="button" data-action="create-set">新增功能集</button>
+            ${annotationHotspot("create-set")}
+          </div>
         </div>
-        ${featureSetList(filteredSets, featureSetKeyword)}
+        <div class="annotated-block annotation-fill">
+          ${featureSetList(filteredSets, featureSetKeyword)}
+          ${annotationHotspot("set-list")}
+        </div>
       </aside>
 
       <article class="detail-pane">
@@ -284,11 +893,26 @@ function renderFeatureSets() {
                     <p>当前功能集共 ${currentVersions.length} 条版本记录，用于沉淀该功能集下的能力迭代。</p>
                   </div>
                   <div class="button-row version-toolbar">
-                    ${viewSwitch()}
-                    <button class="primary-action" type="button" data-action="create-version">新增版本</button>
+                    <div class="annotated-block annotation-inline">
+                      ${viewSwitch()}
+                      ${annotationHotspot("view-switch")}
+                    </div>
+                    <div class="annotated-block annotation-align-right">
+                      <button class="primary-action" type="button" data-action="create-version">新增版本</button>
+                      ${annotationHotspot("create-version")}
+                    </div>
                   </div>
                 </div>
-                ${versionView === "versions" ? versionTable(currentVersions) : operationLogTable(currentLogs)}
+                ${
+                  versionView === "versions"
+                    ? `
+                      <div class="annotated-block annotation-fill">
+                        ${versionTable(currentVersions)}
+                        ${annotationHotspot("version-actions")}
+                      </div>
+                    `
+                    : operationLogTable(currentLogs)
+                }
               </section>
             `
             : `<section class="page-card empty-detail-card">${emptyState(isSearching ? "未找到匹配功能集" : "暂无功能集", isSearching ? `未匹配到名称或编码包含“${escapeHtml(featureSetKeyword)}”的功能集，请调整关键词后重试。` : "请先新增功能集，再维护对应的版本记录。")}</section>`
@@ -421,6 +1045,49 @@ function renderGuide() {
   `;
 }
 
+function renderPrd() {
+  els.content.innerHTML = `
+    <section class="page-card prd-hero">
+      <div class="card-header prd-hero-header">
+        <div>
+          <h3>机型功能集版本管理平台产品需求文档（PRD）</h3>
+          <p>本页将完整 PRD 同步进平台内，供研发、测试、产品、交付等角色直接按章节查阅，不必在页面原型与外部文档之间来回切换。</p>
+        </div>
+        <div class="prd-hero-meta">
+          <span>适用范围：MVP / 一期 / 长期规划</span>
+          <span>更新日期：2026-05-26</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="prd-layout">
+      <aside class="page-card prd-index-card">
+        <div class="card-header compact-header">
+          <div>
+            <h3>章节目录</h3>
+            <p>点击可快速定位对应章节</p>
+          </div>
+        </div>
+        <nav class="prd-index-list" aria-label="PRD章节目录">
+          ${prdSections
+            .map(
+              (section) => `
+                <a class="prd-index-item" href="#${section.id}">
+                  <span>${section.title}</span>
+                </a>
+              `
+            )
+            .join("")}
+        </nav>
+      </aside>
+
+      <article class="prd-content">
+        ${prdSections.map((section) => prdSection(section)).join("")}
+      </article>
+    </section>
+  `;
+}
+
 function renderStandards() {
   els.content.innerHTML = `
     <section class="page-card">
@@ -442,14 +1109,15 @@ function renderStandards() {
 
 function featureOverviewPanel() {
   return `
-    <section class="page-card feature-overview-card">
-      <div class="overview-top">
+    <section class="page-card feature-overview-card annotated-block">
+      <div class="overview-top overview-top-split">
         <form class="overview-search-form" id="featureSetSearchForm">
           <span class="overview-prefix">请输入：</span>
           <input id="featureSetSearch" type="search" placeholder="功能集名称 / 功能集编码" value="${escapeAttr(featureSetKeyword)}" />
-          <button class="ghost-action search-submit" type="submit">搜索</button>
+          <button class="ghost-action search-submit" type="submit">查询</button>
           <button class="ghost-action search-reset" type="button" data-action="reset-search" ${featureSetKeyword ? "" : "disabled"}>重置</button>
         </form>
+        ${annotationHotspot("query")}
       </div>
     </section>
   `;
@@ -465,7 +1133,7 @@ function featureExplainCards() {
   `;
 }
 
-function overviewCard(index, title, highlight, text) {
+function overviewCard(index, title, highlight, text, detail = "") {
   return `
     <article class="overview-note">
       <span class="overview-note-index">${index}</span>
@@ -473,6 +1141,7 @@ function overviewCard(index, title, highlight, text) {
         <strong>${title}</strong>
         <em>${highlight}</em>
         <p>${text}</p>
+        ${detail ? `<span class="overview-note-detail">${detail}</span>` : ""}
       </div>
     </article>
   `;
@@ -481,7 +1150,7 @@ function overviewCard(index, title, highlight, text) {
 function featureSetList(rows, keyword = "") {
   if (!rows.length) return emptyState(keyword ? "未找到匹配功能集" : "暂无功能集", keyword ? `没有匹配“${escapeHtml(keyword)}”的名称或编码。` : "点击新增功能集，先定义能力边界。");
   return `
-    <div class="set-list">
+    <div class="set-list" aria-label="功能集列表区域">
       ${rows
         .map((item) => {
           const setVersions = versions.filter((version) => version.featureSetId === item.id);
@@ -521,10 +1190,13 @@ function selectedSetHeader(item, setVersions) {
           ${infoItem("创建时间", item.createdAt)}
         </div>
       </div>
-      <div class="context-actions">
-        <button class="chip-button" type="button" data-action="edit-set" data-id="${item.id}">编辑</button>
-        <button class="chip-button" type="button" data-action="toggle-set" data-id="${item.id}">${item.status === "停用" ? "启用" : "停用"}</button>
-        <button class="danger-outline" type="button" data-action="delete-set" data-id="${item.id}">删除</button>
+      <div class="context-actions annotated-block annotation-stack">
+        <div class="button-row context-action-row">
+          <button class="chip-button" type="button" data-action="edit-set" data-id="${item.id}">编辑</button>
+          <button class="chip-button" type="button" data-action="toggle-set" data-id="${item.id}">${item.status === "停用" ? "启用" : "停用"}</button>
+          <button class="danger-outline" type="button" data-action="delete-set" data-id="${item.id}">删除</button>
+        </div>
+        ${annotationHotspot("set-actions")}
       </div>
     </section>
   `;
@@ -728,21 +1400,192 @@ function planningRow(title, text) {
   `;
 }
 
+function prdSection(section) {
+  return `
+    <section class="page-card prd-section-card" id="${section.id}">
+      <div class="card-header">
+        <div>
+          <h3>${section.title}</h3>
+          <p>${section.intro || ""}</p>
+        </div>
+      </div>
+      <div class="prd-section-body">
+        ${section.blocks.map((block) => prdBlock(block)).join("")}
+      </div>
+    </section>
+  `;
+}
+
+function prdBlock(block) {
+  if (block.type === "definition") {
+    return `
+      <div class="prd-definition-list">
+        ${block.items
+          .map(
+            ([label, value]) => `
+              <div class="prd-definition-item">
+                <em>${label}</em>
+                <strong>${value}</strong>
+              </div>
+            `
+          )
+          .join("")}
+      </div>
+    `;
+  }
+
+  if (block.type === "highlight") {
+    return `
+      <article class="prd-highlight-card">
+        <strong>${block.title}</strong>
+        <p>${block.text}</p>
+      </article>
+    `;
+  }
+
+  if (block.type === "bullets") {
+    return `
+      <section class="prd-block">
+        ${block.title ? `<strong class="prd-block-title">${block.title}</strong>` : ""}
+        <ul class="prd-bullet-list">
+          ${block.items.map((item) => `<li>${item}</li>`).join("")}
+        </ul>
+      </section>
+    `;
+  }
+
+  if (block.type === "numbered") {
+    return `
+      <section class="prd-block">
+        ${block.title ? `<strong class="prd-block-title">${block.title}</strong>` : ""}
+        <ol class="prd-numbered-list">
+          ${block.items.map((item) => `<li>${item}</li>`).join("")}
+        </ol>
+      </section>
+    `;
+  }
+
+  if (block.type === "cards") {
+    return `
+      <section class="prd-block">
+        ${block.title ? `<strong class="prd-block-title">${block.title}</strong>` : ""}
+        <div class="prd-card-grid">
+          ${block.items
+            .map(
+              ([title, text]) => `
+                <article class="prd-mini-card">
+                  <strong>${title}</strong>
+                  <p>${text}</p>
+                </article>
+              `
+            )
+            .join("")}
+        </div>
+      </section>
+    `;
+  }
+
+  if (block.type === "columns") {
+    return `
+      <section class="prd-block">
+        ${block.title ? `<strong class="prd-block-title">${block.title}</strong>` : ""}
+        <div class="prd-columns">
+          ${block.columns
+            .map(
+              (column) => `
+                <article class="prd-column-card">
+                  <strong>${column.heading}</strong>
+                  <ul class="prd-bullet-list">
+                    ${column.items.map((item) => `<li>${item}</li>`).join("")}
+                  </ul>
+                </article>
+              `
+            )
+            .join("")}
+        </div>
+      </section>
+    `;
+  }
+
+  if (block.type === "timeline") {
+    return `
+      <section class="prd-block">
+        ${block.title ? `<strong class="prd-block-title">${block.title}</strong>` : ""}
+        <div class="prd-timeline">
+          ${block.items
+            .map(
+              ([label, text]) => `
+                <article class="prd-timeline-item">
+                  <span class="prd-timeline-mark">${label}</span>
+                  <p>${text}</p>
+                </article>
+              `
+            )
+            .join("")}
+        </div>
+      </section>
+    `;
+  }
+
+  if (block.type === "diagram") {
+    return `
+      <section class="prd-block">
+        ${block.title ? `<strong class="prd-block-title">${block.title}</strong>` : ""}
+        <pre class="prd-diagram">${escapeHtml(block.text)}</pre>
+      </section>
+    `;
+  }
+
+  if (block.type === "functional-groups") {
+    return `
+      <div class="prd-functional-groups">
+        ${block.groups
+          .map(
+            (group) => `
+              <section class="prd-functional-group">
+                <strong class="prd-block-title">${group.title}</strong>
+                <div class="prd-functional-list">
+                  ${group.items
+                    .map(
+                      ([title, text]) => `
+                        <article class="prd-functional-item">
+                          <strong>${title}</strong>
+                          <p>${text}</p>
+                        </article>
+                      `
+                    )
+                    .join("")}
+                </div>
+              </section>
+            `
+          )
+          .join("")}
+      </div>
+    `;
+  }
+
+  return "";
+}
+
 function handleAction(action, id) {
   if (action === "select-set") {
     selectedFeatureSetId = id;
+    activeAnnotationId = "";
     render();
   }
   if (action === "clear-search") {
     featureSetKeyword = "";
+    activeAnnotationId = "";
     renderFeatureSets();
   }
   if (action === "reset-search") {
     featureSetKeyword = "";
+    activeAnnotationId = "";
     renderFeatureSets();
   }
   if (action === "switch-version-view") {
     versionView = id;
+    activeAnnotationId = "";
     render();
   }
   if (action === "create-set") openFeatureSetForm();
@@ -796,6 +1639,7 @@ function openImportModal() {
     <div class="modal-shell import-shell">
       <div class="drawer-title-block">
         <h3>批量导入功能集及版本</h3>
+        <p>适用于历史数据补录或批量初始化场景，导入前请先确认字段命名与 JSON 结构一致。</p>
       </div>
       <div class="import-template">${escapeHtml(importTemplate)}</div>
       <div class="import-dropzone">
@@ -1015,6 +1859,51 @@ function formToggle(label, name, value) {
   `;
 }
 
+function annotationHotspot(anchor) {
+  const item = annotationItems.find((entry) => entry.anchor === anchor);
+  if (!item) return "";
+  const isActive = activeAnnotationId === item.id;
+  return `
+    <div class="annotation-hotspot ${isActive ? "active" : ""}">
+      <button class="annotation-pin ${isActive ? "active" : ""}" type="button" data-annotation-toggle="${item.id}" aria-expanded="${String(isActive)}" aria-label="${item.title}说明">
+        ${item.id}
+      </button>
+      ${
+        isActive
+          ? `
+            <aside class="annotation-popover" aria-label="${item.title}交互说明">
+              <div class="annotation-popover-head">
+                <span class="annotation-badge">${item.id}</span>
+                <strong>${item.title}</strong>
+              </div>
+              ${annotationField("场景说明", item.scene)}
+              ${annotationField("操作名称", item.title)}
+              ${annotationField("触发方式", item.trigger)}
+              ${annotationField("字段说明", item.fields)}
+              ${annotationField("交互说明", item.interaction)}
+              ${annotationField("结果逻辑校验", item.result)}
+            </aside>
+          `
+          : ""
+      }
+    </div>
+  `;
+}
+
+function annotationField(label, value) {
+  return `
+    <div class="annotation-section">
+      <em>${label}</em>
+      <p>${value}</p>
+    </div>
+  `;
+}
+
+function handleAnnotationToggle(id) {
+  activeAnnotationId = activeAnnotationId === id ? "" : id;
+  render();
+}
+
 function toggleFeatureSetSwitch() {
   const input = document.querySelector('#featureSetForm input[name="status"]');
   const button = document.querySelector(".status-switch");
@@ -1105,6 +1994,7 @@ function escapeAttr(value = "") {
 }
 
 function openDrawer(content) {
+  activeAnnotationId = "";
   els.drawerContent.innerHTML = content;
   els.drawer.classList.add("open");
   els.drawerMask.classList.add("open");
