@@ -258,6 +258,8 @@ function renderFeatureSets() {
   const totalText = isSearching ? `匹配 ${filteredSets.length} 项，共 ${featureSets.length} 项` : `共 ${featureSets.length} 项`;
 
   els.content.innerHTML = `
+    ${featureExplainCards()}
+    ${featureOverviewPanel()}
     <section class="master-detail">
       <aside class="page-card master-pane">
         <div class="card-header compact-header">
@@ -267,7 +269,6 @@ function renderFeatureSets() {
           </div>
           <button class="primary-action" type="button" data-action="create-set">新增功能集</button>
         </div>
-        ${searchToolbar()}
         ${featureSetList(filteredSets, featureSetKeyword)}
       </aside>
 
@@ -275,7 +276,6 @@ function renderFeatureSets() {
         ${
           currentSet
             ? `
-              ${moduleBrief(currentSet)}
               ${selectedSetHeader(currentSet, currentVersions)}
               <section class="page-card version-workbench">
                 <div class="card-header">
@@ -297,10 +297,12 @@ function renderFeatureSets() {
     </section>
   `;
 
-  const searchInput = $("#featureSetSearch");
-  if (searchInput) {
-    searchInput.addEventListener("input", (event) => {
-      featureSetKeyword = event.target.value;
+  const searchForm = $("#featureSetSearchForm");
+  if (searchForm) {
+    searchForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const searchInput = $("#featureSetSearch");
+      featureSetKeyword = searchInput?.value.trim() || "";
       renderFeatureSets();
     });
   }
@@ -376,8 +378,8 @@ function renderGuide() {
       </div>
       <div class="interaction-grid">
         ${interactionCard("功能集查询", [
-          "查询位置在功能集列表上方，只支持按功能集名称和功能集编码检索。",
-          "输入后实时筛选列表，无需额外点击查询按钮。",
+          "查询位置在功能集管理说明下方，只支持按功能集名称和功能集编码检索。",
+          "输入关键词后点击搜索或按 Enter 执行查询，点击重置恢复全部列表。",
           "若当前选中项仍在结果中，右侧详情保持；若被筛掉，则自动切换到第一条匹配结果。"
         ])}
         ${interactionCard("新增/编辑功能集", [
@@ -438,15 +440,41 @@ function renderStandards() {
   `;
 }
 
-function searchToolbar() {
+function featureOverviewPanel() {
   return `
-    <div class="search-toolbar">
-      <label class="search-field">
-        <span>功能集查询</span>
-        <input id="featureSetSearch" type="search" placeholder="按功能集名称或编码检索" value="${escapeAttr(featureSetKeyword)}" />
-      </label>
-      <button class="ghost-action" type="button" data-action="clear-search" ${featureSetKeyword ? "" : "disabled"}>清空</button>
-    </div>
+    <section class="page-card feature-overview-card">
+      <div class="overview-top">
+        <form class="overview-search-form" id="featureSetSearchForm">
+          <span class="overview-prefix">请输入：</span>
+          <input id="featureSetSearch" type="search" placeholder="功能集名称 / 功能集编码" value="${escapeAttr(featureSetKeyword)}" />
+          <button class="ghost-action search-submit" type="submit">搜索</button>
+          <button class="ghost-action search-reset" type="button" data-action="reset-search" ${featureSetKeyword ? "" : "disabled"}>重置</button>
+        </form>
+      </div>
+    </section>
+  `;
+}
+
+function featureExplainCards() {
+  return `
+    <section class="overview-strip section-strip" aria-label="模块说明">
+      ${overviewCard("01", "功能集定义", "负责定义能力边界", "统一维护功能集名称、编码、状态与说明，明确当前能力口径。")}
+      ${overviewCard("02", "版本记录沉淀", "负责沉淀发布快照", "按版本持续沉淀可发布、可引用、可追溯的能力快照与迭代内容。")}
+      ${overviewCard("03", "操作日志回溯", "负责留痕关键动作", "记录创建、保存、发布等关键操作，为后续回溯和核对提供依据。")}
+    </section>
+  `;
+}
+
+function overviewCard(index, title, highlight, text) {
+  return `
+    <article class="overview-note">
+      <span class="overview-note-index">${index}</span>
+      <div class="overview-note-body">
+        <strong>${title}</strong>
+        <em>${highlight}</em>
+        <p>${text}</p>
+      </div>
+    </article>
   `;
 }
 
@@ -473,25 +501,6 @@ function featureSetList(rows, keyword = "") {
         })
         .join("")}
     </div>
-  `;
-}
-
-function moduleBrief(item) {
-  return `
-    <section class="page-card module-brief-card">
-      <div class="module-brief-head">
-        <div>
-          <strong>模块摘要</strong>
-          <p>当前正在查看“${item.name}”的能力边界与版本沉淀情况。</p>
-        </div>
-        <span class="brief-tag">MVP 范围</span>
-      </div>
-      <div class="module-brief-points">
-        <span>功能集负责定义能力边界与维护口径</span>
-        <span>版本记录负责沉淀可发布、可追溯的能力快照</span>
-        <span>操作日志负责留痕关键动作，便于后续回溯</span>
-      </div>
-    </section>
   `;
 }
 
@@ -725,6 +734,10 @@ function handleAction(action, id) {
     render();
   }
   if (action === "clear-search") {
+    featureSetKeyword = "";
+    renderFeatureSets();
+  }
+  if (action === "reset-search") {
     featureSetKeyword = "";
     renderFeatureSets();
   }
