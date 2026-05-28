@@ -1457,6 +1457,41 @@ code {
   grid-column: 1 / -1;
 }
 
+.field-label-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  width: fit-content;
+}
+
+.field-tip .tooltip-icon {
+  width: 15px;
+  height: 15px;
+  font-size: 10px;
+}
+
+.field-error {
+  display: none;
+  min-height: 18px;
+  color: var(--danger);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.field-error.show {
+  display: block;
+}
+
+input.field-invalid,
+textarea.field-invalid {
+  background: #fffafa;
+  border-color: #f04438;
+}
+
+.textarea-compact textarea {
+  min-height: 96px;
+}
+
 .toggle-field {
   display: grid;
   gap: 12px;
@@ -1499,9 +1534,9 @@ code {
   position: absolute;
   top: calc(100% + 8px);
   left: 50%;
-  z-index: 4;
+  z-index: 70;
   display: none;
-  width: 220px;
+  width: 260px;
   padding: 10px 12px;
   color: #fff;
   background: rgba(31, 45, 61, 0.92);

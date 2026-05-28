@@ -166,6 +166,67 @@ const fieldStandards = [
   { field: "版本描述", key: "description", required: "是", rule: "说明该版本的适用设备、交互范围和能力边界。", example: "支持仅 WiFi 的设备与平台端进行基础交互。" }
 ];
 
+const commonNamePattern = /^[\u4e00-\u9fa5A-Za-z0-9\s（）()_\-\/+&·]+$/;
+const featureCodePattern = /^[a-z][a-z0-9_]*$/;
+const versionNoPattern = /^V\d+(\.\d+)?$/i;
+
+const formValidationRules = {
+  featureSetForm: {
+    name: {
+      label: "功能集名称",
+      required: true,
+      maxLength: 30,
+      pattern: commonNamePattern,
+      invalidMessage: "功能集名称仅支持中文、英文、数字、空格及 - _ / + & （）等常用字符",
+      tip: "支持中文、英文、数字、空格及常用连接符，最多 30 个字符。"
+    },
+    code: {
+      label: "功能集编码",
+      required: true,
+      maxLength: 50,
+      pattern: featureCodePattern,
+      invalidMessage: "功能集编码需以小写字母开头，仅支持小写英文、数字和下划线",
+      tip: "以小写字母开头，仅支持小写英文、数字和下划线，最多 50 个字符。"
+    },
+    description: {
+      label: "功能集说明",
+      required: true,
+      maxLength: 200,
+      tip: "说明功能集覆盖的能力边界、适用场景和维护口径，最多 200 个字符。"
+    }
+  },
+  versionForm: {
+    versionNo: {
+      label: "版本号",
+      required: true,
+      maxLength: 12,
+      pattern: versionNoPattern,
+      invalidMessage: "版本号格式需为 V1.0、V2.0 这类 V + 数字版本号",
+      tip: "格式为 V + 主版本号 + . + 次版本号，例如 V1.0，最多 12 个字符。"
+    },
+    versionName: {
+      label: "版本名称",
+      required: true,
+      maxLength: 30,
+      pattern: commonNamePattern,
+      invalidMessage: "版本名称仅支持中文、英文、数字、空格及 - _ / + & （）等常用字符",
+      tip: "支持中文、英文、数字、空格及常用连接符，最多 30 个字符。"
+    },
+    capabilityScope: {
+      label: "能力范围",
+      required: true,
+      maxLength: 200,
+      tip: "可输入多项能力范围，支持用顿号、分号或换行分隔，最多 200 个字符。"
+    },
+    description: {
+      label: "版本描述",
+      required: true,
+      maxLength: 300,
+      tip: "补充适用设备、交互场景和边界说明，最多 300 个字符。"
+    }
+  }
+};
+
 const importTemplate = `JSON 格式:
 {
   "items": [
@@ -783,6 +844,7 @@ function bindEvents() {
   els.drawerClose.addEventListener("click", closeDrawer);
   els.drawerMask.addEventListener("click", closeDrawer);
   els.drawerContent.addEventListener("click", handleDrawerClick);
+  els.drawerContent.addEventListener("input", handleDrawerInput);
 
   document.addEventListener("click", (event) => {
     const annotationToggle = event.target.closest("[data-annotation-toggle]");
@@ -1611,8 +1673,18 @@ function handleDrawerClick(event) {
   if (action.dataset.modalAction === "toggle-status") toggleFeatureSetSwitch();
 }
 
+function handleDrawerInput(event) {
+  const field = event.target.closest("input[name], textarea[name]");
+  if (!field) return;
+  const form = field.closest("form");
+  if (!form || !formValidationRules[form.id]?.[field.name]) return;
+  enforceMaxLength(field, formValidationRules[form.id][field.name]);
+  validateField(form, field.name);
+}
+
 function openFeatureSetForm(item = {}) {
   const title = item.id ? "编辑功能集" : "新增功能集";
+  const rules = formValidationRules.featureSetForm;
   openDrawer(`
     <div class="modal-shell">
       <div class="drawer-title-block">
@@ -1620,10 +1692,10 @@ function openFeatureSetForm(item = {}) {
         <p>功能集用于定义稳定能力边界；具体能力范围和版本快照在版本记录中维护。</p>
       </div>
       <form class="form-grid" id="featureSetForm">
-        ${formInput("功能集名称", "name", item.name || "", "例如：网络类型功能集", true)}
-        ${formInput("功能集编码", "code", item.code || "", "例如：network_type", true)}
+        ${formInput("功能集名称", "name", item.name || "", "例如：网络类型功能集", rules.name)}
+        ${formInput("功能集编码", "code", item.code || "", "例如：network_type", rules.code)}
         ${formToggle("功能集状态", "status", item.status || "启用")}
-        ${formTextarea("功能集说明", "description", item.description || "", "说明该功能集覆盖的能力范围、适用场景和边界", true)}
+        ${formTextarea("功能集说明", "description", item.description || "", "说明该功能集覆盖的能力范围、适用场景和边界", rules.description)}
         <div class="form-help form-wide">填写建议：功能集用于描述稳定能力边界，不承载某一版本的具体能力范围。</div>
         <div class="drawer-actions">
           <button class="ghost-action" type="button" data-modal-action="close">取消</button>
@@ -1660,6 +1732,7 @@ function openVersionForm(item = {}, readOnly = false) {
     showToast("请先选择一个功能集，再新增版本", "error");
     return;
   }
+  const rules = formValidationRules.versionForm;
   openDrawer(`
     <div class="modal-shell">
       <div class="drawer-title-block">
@@ -1668,11 +1741,10 @@ function openVersionForm(item = {}, readOnly = false) {
       </div>
       <form class="form-grid ${readOnly ? "readonly-form" : ""}" id="versionForm">
         <input type="hidden" name="featureSetId" value="${currentSet.id}" />
-        ${formInput("版本号", "versionNo", item.versionNo || nextVersionNo(currentSet.id), "例如：V1.0", true, readOnly)}
-        ${formInput("版本名称", "versionName", item.versionName || "", "例如：仅 WiFi 设备交互版本", true, readOnly)}
-        ${formInput("能力范围", "capabilityScope", item.capabilityScope || "", "例如：仅 WiFi", true, readOnly)}
-        <span class="form-placeholder" aria-hidden="true"></span>
-        ${formTextarea("版本描述", "description", item.description || "", "说明该版本的适用设备、交互范围和能力边界", true, readOnly)}
+        ${formInput("版本号", "versionNo", item.versionNo || nextVersionNo(currentSet.id), "例如：V1.0", { ...rules.versionNo, disabled: readOnly })}
+        ${formInput("版本名称", "versionName", item.versionName || "", "例如：仅 WiFi 设备交互版本", { ...rules.versionName, disabled: readOnly })}
+        ${formTextarea("能力范围", "capabilityScope", item.capabilityScope || "", "例如：仅 WiFi；WiFi+4G；支持低功耗唤醒与短时在线", { ...rules.capabilityScope, disabled: readOnly, className: "form-wide textarea-compact" })}
+        ${formTextarea("版本描述", "description", item.description || "", "说明该版本的适用设备、交互范围和能力边界", { ...rules.description, disabled: readOnly })}
         <div class="form-help form-wide">填写建议：版本记录用于沉淀当前功能集下的能力范围和交互边界，发布后可视为正式版本快照。</div>
         <div class="drawer-actions">
           <button class="ghost-action" type="button" data-modal-action="close">${readOnly ? "关闭" : "取消"}</button>
@@ -1693,10 +1765,14 @@ function openVersionForm(item = {}, readOnly = false) {
 function saveFeatureSet(id) {
   const form = $("#featureSetForm");
   const data = Object.fromEntries(new FormData(form).entries());
-  if (!data.name || !data.code || !data.description) {
-    showToast("请补全功能集名称、功能集编码和功能集说明", "error");
+  if (!validateForm(form)) {
+    showToast("请检查标红字段后再保存", "error");
     return;
   }
+
+  data.name = data.name.trim();
+  data.code = data.code.trim();
+  data.description = data.description.trim();
 
   if (id) {
     featureSets = featureSets.map((item) => (item.id === id ? { ...item, ...data, updatedAt: nowText() } : item));
@@ -1723,10 +1799,20 @@ function saveFeatureSet(id) {
 function saveVersion(id, mode = "save") {
   const form = $("#versionForm");
   const data = Object.fromEntries(new FormData(form).entries());
-  if (!data.featureSetId || !data.versionNo || !data.versionName || !data.capabilityScope || !data.description) {
-    showToast("请补全版本号、版本名称、能力范围和版本描述", "error");
+  if (!data.featureSetId || !validateForm(form)) {
+    showToast("请检查标红字段后再保存", "error");
     return;
   }
+
+  const versionNo = data.versionNo.trim();
+  const versionName = data.versionName.trim();
+  const capabilityScope = data.capabilityScope.trim();
+  const description = data.description.trim();
+
+  data.versionNo = versionNo;
+  data.versionName = versionName;
+  data.capabilityScope = capabilityScope;
+  data.description = description;
 
   const nextStatus = mode === "publish" ? "已发布" : "草稿";
   const publishedAt = mode === "publish" ? todayText() : "";
@@ -1808,20 +1894,90 @@ function deleteVersion(id) {
   render();
 }
 
-function formInput(label, name, value, placeholder, required = false, disabled = false) {
+function validateForm(form) {
+  if (!form) return false;
+  const rules = formValidationRules[form.id];
+  if (!rules) return true;
+  return Object.keys(rules).map((name) => validateField(form, name)).every(Boolean);
+}
+
+function validateField(form, name) {
+  const field = form.elements[name];
+  const rule = formValidationRules[form.id]?.[name];
+  if (!field || !rule) return true;
+  const value = field.value.trim();
+  let message = "";
+
+  if (rule.required && !value) {
+    message = `请输入${rule.label}`;
+  } else if (rule.maxLength && value.length > rule.maxLength) {
+    message = `${rule.label}最多 ${rule.maxLength} 个字符`;
+  } else if (rule.pattern && value && !rule.pattern.test(value)) {
+    message = rule.invalidMessage || `${rule.label}格式不正确`;
+  }
+
+  setFieldError(field, message);
+  return !message;
+}
+
+function setFieldError(field, message) {
+  const wrapper = field.closest("label");
+  const error = wrapper?.querySelector(`[data-error-for="${field.name}"]`);
+  field.classList.toggle("field-invalid", Boolean(message));
+  if (!error) return;
+  error.textContent = message;
+  error.classList.toggle("show", Boolean(message));
+}
+
+function enforceMaxLength(field, rule) {
+  if (!rule?.maxLength || field.value.length <= rule.maxLength) return;
+  field.value = field.value.slice(0, rule.maxLength);
+}
+
+function fieldLabel(label, required, tip) {
+  return `
+    <span class="field-label-row">
+      <span>${label}${required ? '<b class="required">*</b>' : ""}</span>
+      ${tip ? fieldTooltip(tip) : ""}
+    </span>
+  `;
+}
+
+function fieldTooltip(text) {
+  return `
+    <span class="tooltip-anchor field-tip" tabindex="0" aria-label="字段填写规则">
+      <span class="tooltip-icon" aria-hidden="true">i</span>
+      <span class="tooltip-bubble">${escapeHtml(text)}</span>
+    </span>
+  `;
+}
+
+function fieldAttrs(options = {}) {
+  const attrs = [];
+  if (options.disabled) attrs.push("disabled");
+  if (options.maxLength) attrs.push(`maxlength="${options.maxLength}"`);
+  return attrs.join(" ");
+}
+
+function formInput(label, name, value, placeholder, options = {}) {
+  const required = Boolean(options.required);
   return `
     <label>
-      <span>${label}${required ? '<b class="required">*</b>' : ""}</span>
-      <input name="${name}" value="${escapeAttr(value)}" placeholder="${placeholder}" ${disabled ? "disabled" : ""} />
+      ${fieldLabel(label, required, options.tip)}
+      <input name="${name}" value="${escapeAttr(value)}" placeholder="${escapeAttr(placeholder)}" ${fieldAttrs(options)} />
+      <small class="field-error" data-error-for="${name}" aria-live="polite"></small>
     </label>
   `;
 }
 
-function formTextarea(label, name, value, placeholder, required = false, disabled = false) {
+function formTextarea(label, name, value, placeholder, options = {}) {
+  const required = Boolean(options.required);
+  const className = options.className || "form-wide";
   return `
-    <label class="form-wide">
-      <span>${label}${required ? '<b class="required">*</b>' : ""}</span>
-      <textarea name="${name}" placeholder="${placeholder}" ${disabled ? "disabled" : ""}>${escapeHtml(value)}</textarea>
+    <label class="${className}">
+      ${fieldLabel(label, required, options.tip)}
+      <textarea name="${name}" placeholder="${escapeAttr(placeholder)}" ${fieldAttrs(options)}>${escapeHtml(value)}</textarea>
+      <small class="field-error" data-error-for="${name}" aria-live="polite"></small>
     </label>
   `;
 }
