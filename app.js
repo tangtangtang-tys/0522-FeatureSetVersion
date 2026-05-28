@@ -6,7 +6,6 @@ const navItems = [
 ];
 
 const setStatusOptions = ["启用", "停用"];
-const versionStatusOptions = ["草稿", "已发布"];
 
 let featureSets = [
   {
@@ -46,8 +45,6 @@ let versions = [
     versionName: "仅 WiFi 设备交互版本",
     capabilityScope: "仅 WiFi",
     description: "支持仅 WiFi 的设备与平台端进行基础交互。",
-    status: "已发布",
-    publishedAt: "2026-04-30",
     createdAt: "2026-04-30 18:10:00"
   },
   {
@@ -57,8 +54,6 @@ let versions = [
     versionName: "仅 4G 设备交互版本",
     capabilityScope: "仅 4G",
     description: "支持仅 4G 的设备与平台端进行基础交互。",
-    status: "已发布",
-    publishedAt: "2026-05-15",
     createdAt: "2026-05-15 11:22:00"
   },
   {
@@ -68,8 +63,6 @@ let versions = [
     versionName: "WiFi+4G 设备交互版本",
     capabilityScope: "WiFi+4G",
     description: "支持双网络设备与平台端进行交互。",
-    status: "已发布",
-    publishedAt: "2026-06-05",
     createdAt: "2026-06-05 09:30:00"
   },
   {
@@ -79,8 +72,6 @@ let versions = [
     versionName: "有线+4G 设备交互版本",
     capabilityScope: "有线+4G",
     description: "支持有线+4G 的设备与平台端进行交互。",
-    status: "草稿",
-    publishedAt: "",
     createdAt: "2026-06-18 16:20:00"
   },
   {
@@ -90,8 +81,6 @@ let versions = [
     versionName: "IPC MQTT 接入版本",
     capabilityScope: "IPC MQTT",
     description: "支持 IPC 设备通过 MQTT 与平台端进行交互。",
-    status: "已发布",
-    publishedAt: "2026-05-01",
     createdAt: "2026-05-01 12:00:00"
   },
   {
@@ -101,8 +90,6 @@ let versions = [
     versionName: "休眠唤醒基础版本",
     capabilityScope: "定时休眠/事件唤醒",
     description: "支持低功耗设备休眠、事件唤醒与短时在线。",
-    status: "草稿",
-    publishedAt: "",
     createdAt: "2026-05-18 15:20:00"
   }
 ];
@@ -111,20 +98,20 @@ const operationLogs = [
   {
     id: "log-network-1",
     featureSetId: "fs-network",
-    action: "发布版本",
+    action: "保存版本",
     target: "V3.0 WiFi+4G 设备交互版本",
     operator: "产品经理A",
     operatedAt: "2026-06-05 10:12:08",
-    result: "发布成功"
+    result: "保存成功"
   },
   {
     id: "log-network-2",
     featureSetId: "fs-network",
-    action: "保存草稿",
+    action: "保存版本",
     target: "V4.0 有线+4G 设备交互版本",
     operator: "产品经理A",
     operatedAt: "2026-06-18 16:20:00",
-    result: "草稿已保存"
+    result: "保存成功"
   },
   {
     id: "log-protocol-1",
@@ -138,11 +125,11 @@ const operationLogs = [
   {
     id: "log-protocol-2",
     featureSetId: "fs-protocol",
-    action: "发布版本",
+    action: "保存版本",
     target: "V1.0 IPC MQTT 接入版本",
     operator: "平台运营B",
     operatedAt: "2026-05-01 12:16:30",
-    result: "发布成功"
+    result: "保存成功"
   },
   {
     id: "log-low-power-1",
@@ -151,7 +138,7 @@ const operationLogs = [
     target: "V1.0 休眠唤醒基础版本",
     operator: "产品经理C",
     operatedAt: "2026-05-18 15:20:00",
-    result: "草稿已创建"
+    result: "创建成功"
   }
 ];
 
@@ -275,7 +262,7 @@ const prdSections = [
         items: [
           "功能项已被维护，但产品承诺视角不足，难以形成完整可售卖、可交付的能力包。",
           "功能项可以演进，但缺少功能集整体版本基线，无法回答某机型某版本到底具备哪些能力。",
-          "数据维护动作已存在，但缺少从需求引入到发布追溯的完整流程闭环。",
+          "数据维护动作已存在，但缺少从需求引入到版本沉淀、日志追溯的完整流程闭环。",
           "角色协同不足，产品、研发、测试、售前、售后尚未统一到同一能力事实源。",
           "当前字段结构偏自然语言，长期难以支撑自动化测试、版本映射和依赖分析。"
         ]
@@ -283,7 +270,7 @@ const prdSections = [
       {
         type: "highlight",
         title: "核心问题定义",
-        text: "需要建立一个可规划、可维护、可发布、可追溯的机型能力治理平台，使摄像机产品线能够围绕“功能集”和“功能集版本”形成统一的产品定义语言，并支撑多角色协同与分阶段扩展。"
+        text: "需要建立一个可规划、可维护、可沉淀、可追溯的机型能力治理平台，使摄像机产品线能够围绕“功能集”和“功能集版本”形成统一的产品定义语言，并支撑多角色协同与分阶段扩展。"
       }
     ]
   },
@@ -298,7 +285,7 @@ const prdSections = [
         items: [
           ["建立能力定义的统一事实源", "将功能项、功能集、功能集版本从分散字段、临时表格和人员经验中抽离出来，形成结构化能力资产。"],
           ["建立版本治理与能力追溯机制", "通过功能集版本固化对外可承诺、对内可交付的能力快照。"],
-          ["建立跨角色协同的最小治理闭环", "围绕需求引入、功能定义、功能集编排、版本沉淀、发布与日志追溯形成闭环。"]
+          ["建立跨角色协同的最小治理闭环", "围绕需求引入、功能定义、功能集编排、版本沉淀与日志追溯形成闭环。"]
         ]
       },
       {
@@ -307,7 +294,7 @@ const prdSections = [
         items: [
           ["MVP", "100% 的新建功能集与功能集版本通过平台录入；查询功能集到版本记录的平均操作路径不超过 3 步。"],
           ["一期", "80% 以上的标准机型能力定义通过功能集字典与版本记录沉淀；跨角色问题确认的人工确认次数明显下降。"],
-          ["长期", "平台成为机型能力定义、版本映射与发布追溯的统一事实源。"]
+          ["长期", "平台成为机型能力定义、版本映射与能力追溯的统一事实源。"]
         ]
       }
     ]
@@ -336,7 +323,7 @@ const prdSections = [
             items: [
               "功能项字典结构化管理",
               "功能集与功能项关系编排",
-              "版本状态机",
+              "版本评审与状态治理",
               "评审记录、引用校验、历史版本对比"
             ]
           },
@@ -395,7 +382,7 @@ const prdSections = [
   {
     id: "prd-flow",
     title: "06 产品整体流程",
-    intro: "平台建设围绕需求引入、能力定义、版本沉淀、发布追溯与后续映射展开。",
+    intro: "平台建设围绕需求引入、能力定义、版本沉淀、日志追溯与后续映射展开。",
     blocks: [
       {
         type: "timeline",
@@ -405,7 +392,7 @@ const prdSections = [
           ["02", "能力定义"],
           ["03", "功能集编排"],
           ["04", "版本沉淀"],
-          ["05", "版本发布"],
+          ["05", "日志留痕"],
           ["06", "能力追溯"],
           ["07", "后续映射与验证"]
         ]
@@ -416,8 +403,7 @@ const prdSections = [
         items: [
           "创建功能集并填写基础信息。",
           "选择目标功能集进入版本记录。",
-          "创建版本草稿并保存。",
-          "发布可引用版本。",
+          "新增版本记录并保存。",
           "查看版本列表与日志记录。"
         ]
       }
@@ -426,11 +412,11 @@ const prdSections = [
   {
     id: "prd-diagrams",
     title: "07 交互流程图",
-    intro: "以研发易查阅的文本流程图方式，明确关键操作路径和状态变化。",
+    intro: "以研发易查阅的文本流程图方式，明确关键操作路径和结果联动。",
     blocks: [
       {
         type: "diagram",
-        title: "功能集创建与版本发布流程",
+        title: "功能集创建与版本记录流程",
         text: `[进入功能集字典页]
         |
         v
@@ -452,15 +438,9 @@ const prdSections = [
                            v
                [填写版本号/版本名称/能力范围/版本描述]
                            |
-                  +--------+--------+
-                  |                 |
-                  v                 v
-              [保存草稿]         [直接发布]
-                  |                 |
-                  v                 v
-              [留存草稿]         [形成已发布版本]
-                  |                 |
-                  +--------+--------+
+                           |
+                           v
+                      [保存版本记录]
                            |
                            v
                       [查看版本列表]
@@ -534,12 +514,11 @@ const prdSections = [
           {
             title: "模块二：版本记录",
             items: [
-              ["版本记录列表", "展示版本号、版本名称、能力范围、版本描述、状态、发布时间和操作。"],
+              ["版本记录列表", "展示版本号、版本名称、能力范围、版本描述、创建时间和操作。"],
               ["新增版本", "通过弹窗录入版本号、版本名称、能力范围和版本描述。"],
-              ["保存草稿", "允许先保存为草稿，后续再发布。"],
-              ["发布版本", "将版本草稿发布为正式版本，并写入发布时间。"],
-              ["查看与编辑版本", "支持只读查看与编辑修改；已发布版本也可继续编辑。"],
-              ["删除版本", "草稿版本支持删除，已发布版本默认不可直接删除。"]
+              ["保存版本", "保存后形成当前功能集下的一条版本记录。"],
+              ["查看与编辑版本", "支持只读查看与编辑修改。"],
+              ["删除版本", "支持删除不再需要的版本记录，删除前需二次确认。"]
             ]
           },
           {
@@ -580,7 +559,7 @@ const prdSections = [
           ["可维护性", "前端结构需支持后续扩展新模块，功能集、版本、日志等对象保持清晰分层。"],
           ["一致性", "状态标签、按钮、卡片、表格、弹窗交互风格一致，文案口径统一。"],
           ["性能", "在当前原型阶段，列表切换与查询无明显卡顿；后续真实系统需保证常见数据量下快速返回。"],
-          ["安全与权限", "删除、发布等关键动作需具备权限控制预留，日志数据支持审计留痕扩展。"],
+          ["安全与权限", "删除、保存等关键动作需具备权限控制预留，日志数据支持审计留痕扩展。"],
           ["兼容与响应式", "桌面端优先，窄屏下保持结构不破碎。"]
         ]
       }
@@ -596,7 +575,7 @@ const prdSections = [
         title: "当前 MVP 核心对象",
         items: [
           ["功能集 FeatureSet", "id、name、code、status、description、createdAt、updatedAt"],
-          ["功能集版本 FeatureSetVersion", "id、featureSetId、versionNo、versionName、capabilityScope、description、status、publishedAt、createdAt"],
+          ["功能集版本 FeatureSetVersion", "id、featureSetId、versionNo、versionName、capabilityScope、description、createdAt"],
           ["操作日志 OperationLog", "id、featureSetId、action、target、operator、operatedAt、result"]
         ]
       },
@@ -638,7 +617,7 @@ const prdSections = [
             items: [
               "查看权限",
               "编辑权限",
-              "发布权限",
+              "版本治理权限",
               "删除/归档权限",
               "审批权限",
               "审计查看权限"
@@ -659,7 +638,7 @@ const prdSections = [
         items: [
           "功能项、功能集、版本三类概念边界不清，可能导致平台定义混乱。",
           "若无统一字段结构化建模，后续扩展到机型绑定和版本映射会出现重构成本。",
-          "若删除与发布没有审计与引用校验，将影响追溯链路完整性。",
+          "若删除与版本变更没有审计与引用校验，将影响追溯链路完整性。",
           "若平台只服务研发视角，将无法成为真正的跨角色能力事实源。"
         ]
       },
@@ -684,7 +663,7 @@ const prdSections = [
         title: "阶段路线图",
         items: [
           ["MVP", "完成功能集字典、版本记录、操作日志、批量导入、查询、字段规范与流程说明的最小治理闭环。"],
-          ["一期", "补齐功能项字典、功能集与功能项关系、版本状态机、评审冻结、引用校验和历史版本对比，升级为可治理的能力治理平台。"],
+          ["一期", "补齐功能项字典、功能集与功能项关系、版本评审与状态治理、引用校验和历史版本对比，升级为可治理的能力治理平台。"],
           ["二期", "扩展机型功能集绑定、SKU/区域/项目关联及软件版本映射。"],
           ["三期", "建设测试与验收、审批与审计、多机型对比和项目定制转标准能力治理。"]
         ]
@@ -705,7 +684,7 @@ const prdSections = [
             items: [
               "支持新增、编辑、启停功能集",
               "支持查询功能集名称与编码",
-              "支持新增版本、保存草稿、发布版本",
+              "支持新增、查看、编辑和删除版本记录",
               "支持查看版本列表与操作日志",
               "支持批量导入入口、字段规范页与流程说明页"
             ]
@@ -788,7 +767,7 @@ const annotationItems = [
     trigger: "点击“版本列表”或“操作日志”页签。",
     fields: "当前操作无字段录入。",
     interaction: "只切换右侧工作区展示内容，不改变当前功能集，也不影响左侧列表选择。",
-    result: "版本列表用于查看版本沉淀内容；操作日志用于查看创建、保存、发布等关键动作留痕。"
+    result: "版本列表用于查看版本沉淀内容；操作日志用于查看创建、保存、编辑、删除等关键动作留痕。"
   },
   {
     id: "06",
@@ -797,18 +776,18 @@ const annotationItems = [
     title: "新增版本",
     trigger: "点击“新增版本”按钮。",
     fields: "版本号、版本名称、能力范围、版本描述。",
-    interaction: "点击后打开版本弹窗，可选择先保存草稿，也可直接发布。",
-    result: "字段全部必填；保存后形成草稿版本；发布后形成正式版本并写入发布时间。"
+    interaction: "点击后打开版本弹窗，填写完成后点击保存形成版本记录。",
+    result: "字段全部必填；保存成功后新增记录进入版本列表，并保留创建时间用于回溯。"
   },
   {
     id: "07",
     anchor: "version-actions",
-    scene: "用于对已有版本记录进行查看、修订、发布或清理，适合版本治理和历史维护场景。",
+    scene: "用于对已有版本记录进行查看、修订或清理，适合版本治理和历史维护场景。",
     title: "版本操作列",
-    trigger: "在版本列表操作列中点击查看、编辑、发布、删除。",
+    trigger: "在版本列表操作列中点击查看、编辑、删除。",
     fields: "当前操作基于已有版本记录，不新增字段；编辑时可修改版本号、版本名称、能力范围、版本描述。",
-    interaction: "已发布版本支持查看和编辑；草稿版本支持编辑、发布与删除；不同状态显示不同操作集合。",
-    result: "已发布版本不可直接删除；草稿版本可删除；发布后版本状态更新为已发布并写入发布时间。"
+    interaction: "查看以只读态打开弹窗；编辑可修改版本内容；删除前进行二次确认。",
+    result: "编辑保存后同步更新版本列表；删除成功后从当前功能集版本列表中移除。"
   },
   {
     id: "08",
@@ -1015,14 +994,14 @@ function renderGuide() {
         <div class="card-header">
           <div>
             <h3>整体流程闭环</h3>
-            <p>围绕“先定义，再沉淀，再发布，再追溯”的管理路径梳理当前模块如何协同。</p>
+            <p>围绕“先定义，再沉淀，再留痕”的管理路径梳理当前模块如何协同。</p>
           </div>
         </div>
         <div class="flow-steps">
           ${flowStep("01", "定义功能集", "产品或平台运营新建功能集，明确名称、编码、状态和边界说明，形成一个可持续维护的能力容器。")}
-          ${flowStep("02", "维护版本草稿", "在对应功能集下新增版本，填写版本号、版本名称、能力范围和版本描述，先保存为草稿。")}
-          ${flowStep("03", "发布可引用版本", "确认能力范围后发布版本，形成可对外引用的能力快照，同时记录发布时间。")}
-          ${flowStep("04", "查看操作留痕", "通过操作日志查看创建、保存、发布等关键动作，为后续问题定位和版本回溯提供依据。")}
+          ${flowStep("02", "维护版本记录", "在对应功能集下新增版本，填写版本号、版本名称、能力范围和版本描述，并保存为版本记录。")}
+          ${flowStep("03", "沉淀能力快照", "通过版本记录固化某一阶段的能力范围和边界说明，方便后续查询和比对。")}
+          ${flowStep("04", "查看操作留痕", "通过操作日志查看创建、保存、编辑、删除等关键动作，为后续问题定位和版本回溯提供依据。")}
           ${flowStep("05", "批量导入补录", "对于历史能力或成批迁移场景，可通过模板一次性导入功能集及版本数据。")}
           ${flowStep("06", "进入后续规划", "当前 MVP 完成最小治理闭环；后续可在此基础上继续承接机型绑定、软件版本映射和测试验收。")}
         </div>
@@ -1075,8 +1054,8 @@ function renderGuide() {
         ])}
         ${interactionCard("版本记录管理", [
           "版本记录默认展示版本列表，可切换到操作日志查看行为留痕。",
-          "新增版本时先保存草稿，再根据需要发布，避免未确认内容直接成为正式快照。",
-          "已发布版本支持查看和编辑；草稿版本支持编辑、发布和删除。"
+          "新增版本时保存为当前功能集下的一条版本记录，暂不维护版本状态字段。",
+          "版本记录支持查看、编辑和删除；删除前需进行二次确认。"
         ])}
         ${interactionCard("批量导入", [
           "入口保留在页面顶部，用于处理历史能力补录和批量迁移。",
@@ -1099,9 +1078,9 @@ function renderGuide() {
           <span>当前 MVP 承接方式</span>
         </div>
         ${planningRow("机型功能集绑定", "当前先用功能集 + 版本快照表达能力基线，后续再将功能集版本与机型、SKU、区域、项目建立绑定关系。")}
-        ${planningRow("软件版本映射", "当前先维护能力定义和版本发布信息，后续可补充固件、App、云平台、算法包的实现版本映射。")}
-        ${planningRow("测试与验收", "当前通过版本记录和操作日志保留发布依据，后续可继续扩展测试范围、用例和验收结论。")}
-        ${planningRow("审批与审计", "当前保留操作日志作为留痕基础，后续可增加评审、冻结、发布审批和引用校验。")}
+        ${planningRow("软件版本映射", "当前先维护能力定义和版本记录信息，后续可补充固件、App、云平台、算法包的实现版本映射。")}
+        ${planningRow("测试与验收", "当前通过版本记录和操作日志保留能力变更依据，后续可继续扩展测试范围、用例和验收结论。")}
+        ${planningRow("审批与审计", "当前保留操作日志作为留痕基础，后续可增加评审审批、冻结和引用校验。")}
       </div>
     </section>
   `;
@@ -1162,7 +1141,7 @@ function renderStandards() {
       <div class="principle-grid">
         ${principle("功能集描述边界", "功能集只维护名称、编码、状态和说明，用于表达能力边界。")}
         ${principle("版本沉淀能力", "版本记录只维护版本号、版本名称、能力范围和版本描述，用于沉淀能力迭代。")}
-        ${principle("发布明确可用性", "版本通过保存与发布两种操作区分草稿和可引用记录。")}
+        ${principle("暂不维护版本状态", "当前 MVP 只沉淀版本记录，不增加版本状态字段。")}
       </div>
       ${standardsTable()}
     </section>
@@ -1189,8 +1168,8 @@ function featureExplainCards() {
   return `
     <section class="overview-strip section-strip" aria-label="模块说明">
       ${overviewCard("01", "功能集定义", "负责定义能力边界", "统一维护功能集名称、编码、状态与说明，明确当前能力口径。")}
-      ${overviewCard("02", "版本记录沉淀", "负责沉淀发布快照", "按版本持续沉淀可发布、可引用、可追溯的能力快照与迭代内容。")}
-      ${overviewCard("03", "操作日志回溯", "负责留痕关键动作", "记录创建、保存、发布等关键操作，为后续回溯和核对提供依据。")}
+      ${overviewCard("02", "版本记录沉淀", "负责沉淀能力快照", "按版本持续沉淀可查询、可比对、可追溯的能力范围与迭代内容。")}
+      ${overviewCard("03", "操作日志回溯", "负责留痕关键动作", "记录创建、保存、编辑、删除等关键操作，为后续回溯和核对提供依据。")}
     </section>
   `;
 }
@@ -1284,8 +1263,7 @@ function versionTable(rows) {
             <th>版本名称</th>
             <th>能力范围</th>
             <th>版本描述</th>
-            <th>状态</th>
-            <th>发布时间</th>
+            <th>创建时间</th>
             <th>操作</th>
           </tr>
         </thead>
@@ -1298,8 +1276,7 @@ function versionTable(rows) {
                   <td>${item.versionName}</td>
                   <td>${item.capabilityScope}</td>
                   <td>${item.description}</td>
-                  <td>${statusTag(item.status)}</td>
-                  <td>${item.publishedAt ? `${item.publishedAt} 00:00:00` : "-"}</td>
+                  <td>${item.createdAt}</td>
                   <td class="actions">${versionActions(item)}</td>
                 </tr>
               `
@@ -1355,15 +1332,9 @@ function viewSwitch() {
 }
 
 function versionActions(item) {
-  if (item.status === "已发布") {
-    return [
-      `<button type="button" data-action="view-version" data-id="${item.id}">查看</button>`,
-      `<button type="button" data-action="edit-version" data-id="${item.id}">编辑</button>`
-    ].join("");
-  }
   return [
+    `<button type="button" data-action="view-version" data-id="${item.id}">查看</button>`,
     `<button type="button" data-action="edit-version" data-id="${item.id}">编辑</button>`,
-    `<button type="button" data-action="publish-version" data-id="${item.id}">发布</button>`,
     `<button class="danger-text" type="button" data-action="delete-version" data-id="${item.id}">删除</button>`
   ].join("");
 }
@@ -1659,11 +1630,9 @@ function handleAction(action, id) {
   if (action === "create-version") openVersionForm();
   if (action === "edit-version") openVersionForm(versions.find((item) => item.id === id));
   if (action === "view-version") openVersionForm(versions.find((item) => item.id === id), true);
-  if (action === "publish-version") publishVersion(id);
   if (action === "delete-version") deleteVersion(id);
   if (action === "save-set") saveFeatureSet(id);
   if (action === "save-version") saveVersion(id, "save");
-  if (action === "publish-version-form") saveVersion(id, "publish");
 }
 
 function handleDrawerClick(event) {
@@ -1745,15 +1714,14 @@ function openVersionForm(item = {}, readOnly = false) {
         ${formInput("版本名称", "versionName", item.versionName || "", "例如：仅 WiFi 设备交互版本", { ...rules.versionName, disabled: readOnly })}
         ${formTextarea("能力范围", "capabilityScope", item.capabilityScope || "", "例如：仅 WiFi；WiFi+4G；支持低功耗唤醒与短时在线", { ...rules.capabilityScope, disabled: readOnly, className: "form-wide textarea-compact" })}
         ${formTextarea("版本描述", "description", item.description || "", "说明该版本的适用设备、交互范围和能力边界", { ...rules.description, disabled: readOnly })}
-        <div class="form-help form-wide">填写建议：版本记录用于沉淀当前功能集下的能力范围和交互边界，发布后可视为正式版本快照。</div>
+        <div class="form-help form-wide">填写建议：版本记录用于沉淀当前功能集下的能力范围和交互边界，当前 MVP 暂不维护版本状态字段。</div>
         <div class="drawer-actions">
           <button class="ghost-action" type="button" data-modal-action="close">${readOnly ? "关闭" : "取消"}</button>
           ${
             readOnly
               ? ""
               : `
-                <button class="ghost-action" type="button" data-action="save-version" data-id="${item.id || ""}">保存</button>
-                <button class="primary-action" type="button" data-action="publish-version-form" data-id="${item.id || ""}">发布</button>
+                <button class="primary-action" type="button" data-action="save-version" data-id="${item.id || ""}">保存</button>
               `
           }
         </div>
@@ -1796,7 +1764,7 @@ function saveFeatureSet(id) {
   render();
 }
 
-function saveVersion(id, mode = "save") {
+function saveVersion(id) {
   const form = $("#versionForm");
   const data = Object.fromEntries(new FormData(form).entries());
   if (!data.featureSetId || !validateForm(form)) {
@@ -1814,21 +1782,16 @@ function saveVersion(id, mode = "save") {
   data.capabilityScope = capabilityScope;
   data.description = description;
 
-  const nextStatus = mode === "publish" ? "已发布" : "草稿";
-  const publishedAt = mode === "publish" ? todayText() : "";
-
   if (id) {
     versions = versions.map((item) =>
       item.id === id
         ? {
             ...item,
-            ...data,
-            status: nextStatus,
-            publishedAt: nextStatus === "已发布" ? publishedAt || item.publishedAt : item.publishedAt
+            ...data
           }
         : item
     );
-    showToast(mode === "publish" ? "版本已发布" : "版本已保存");
+    showToast("版本已保存");
   } else {
     versions.unshift({
       id: `v-${Date.now()}`,
@@ -1837,11 +1800,9 @@ function saveVersion(id, mode = "save") {
       versionName: data.versionName,
       capabilityScope: data.capabilityScope,
       description: data.description,
-      status: nextStatus,
-      publishedAt,
       createdAt: nowText()
     });
-    showToast(mode === "publish" ? "版本已创建并发布" : "版本草稿已保存");
+    showToast("版本已创建");
   }
 
   selectedFeatureSetId = data.featureSetId;
@@ -1873,21 +1834,9 @@ function deleteFeatureSet(id) {
   render();
 }
 
-function publishVersion(id) {
-  const target = versions.find((item) => item.id === id);
-  if (!target) return;
-  versions = versions.map((item) => (item.id === id ? { ...item, status: "已发布", publishedAt: todayText() } : item));
-  showToast(`${target.versionNo} 已发布`);
-  render();
-}
-
 function deleteVersion(id) {
   const target = versions.find((item) => item.id === id);
   if (!target) return;
-  if (target.status === "已发布") {
-    showToast("已发布版本暂不支持删除", "error");
-    return;
-  }
   if (!window.confirm(`确认删除 ${target.versionNo} 吗？删除后无法恢复。`)) return;
   versions = versions.filter((item) => item.id !== id);
   showToast("版本已删除");
@@ -2075,9 +2024,7 @@ function toggleFeatureSetSwitch() {
 function statusTag(value) {
   const typeMap = {
     启用: "success",
-    已发布: "success",
-    停用: "default",
-    草稿: "default"
+    停用: "default"
   };
   return `<span class="status-tag ${typeMap[value] || "default"}">${value}</span>`;
 }
