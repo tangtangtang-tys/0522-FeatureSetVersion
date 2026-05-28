@@ -1,5 +1,5 @@
 const navItems = [
-  { id: "featureSets", label: "功能集管理" },
+  { id: "featureSets", label: "功能集字典" },
   { id: "guide", label: "流程与交互说明" },
   { id: "prd", label: "产品需求文档" },
   { id: "standards", label: "字段规范" }
@@ -44,7 +44,7 @@ let versions = [
     featureSetId: "fs-network",
     versionNo: "V1.0",
     versionName: "仅 WiFi 设备交互版本",
-    supportedCapability: "仅 WiFi",
+    capabilityScope: "仅 WiFi",
     description: "支持仅 WiFi 的设备与平台端进行基础交互。",
     status: "已发布",
     publishedAt: "2026-04-30",
@@ -55,7 +55,7 @@ let versions = [
     featureSetId: "fs-network",
     versionNo: "V2.0",
     versionName: "仅 4G 设备交互版本",
-    supportedCapability: "仅 4G",
+    capabilityScope: "仅 4G",
     description: "支持仅 4G 的设备与平台端进行基础交互。",
     status: "已发布",
     publishedAt: "2026-05-15",
@@ -66,7 +66,7 @@ let versions = [
     featureSetId: "fs-network",
     versionNo: "V3.0",
     versionName: "WiFi+4G 设备交互版本",
-    supportedCapability: "WiFi+4G",
+    capabilityScope: "WiFi+4G",
     description: "支持双网络设备与平台端进行交互。",
     status: "已发布",
     publishedAt: "2026-06-05",
@@ -77,7 +77,7 @@ let versions = [
     featureSetId: "fs-network",
     versionNo: "V4.0",
     versionName: "有线+4G 设备交互版本",
-    supportedCapability: "有线+4G",
+    capabilityScope: "有线+4G",
     description: "支持有线+4G 的设备与平台端进行交互。",
     status: "草稿",
     publishedAt: "",
@@ -88,7 +88,7 @@ let versions = [
     featureSetId: "fs-protocol",
     versionNo: "V1.0",
     versionName: "IPC MQTT 接入版本",
-    supportedCapability: "IPC MQTT",
+    capabilityScope: "IPC MQTT",
     description: "支持 IPC 设备通过 MQTT 与平台端进行交互。",
     status: "已发布",
     publishedAt: "2026-05-01",
@@ -99,7 +99,7 @@ let versions = [
     featureSetId: "fs-low-power",
     versionNo: "V1.0",
     versionName: "休眠唤醒基础版本",
-    supportedCapability: "定时休眠/事件唤醒",
+    capabilityScope: "定时休眠/事件唤醒",
     description: "支持低功耗设备休眠、事件唤醒与短时在线。",
     status: "草稿",
     publishedAt: "",
@@ -159,11 +159,11 @@ const fieldStandards = [
   { field: "功能集名称", key: "name", required: "是", rule: "使用业务可理解名称，用于定义一个能力集合。", example: "网络类型功能集" },
   { field: "功能集编码", key: "code", required: "是", rule: "英文小写、数字、下划线，创建后原则上不可修改。", example: "network_type" },
   { field: "功能集状态", key: "status", required: "是", rule: "仅保留启用、停用两种状态，默认启用。", example: "启用" },
-  { field: "功能集说明", key: "description", required: "是", rule: "说明该功能集管理的能力集合和边界。", example: "定义不同网络接入类型的设备与平台端交互能力边界。" },
+  { field: "功能集说明", key: "description", required: "是", rule: "说明该功能集覆盖的能力范围、适用场景和边界。", example: "定义不同网络接入类型的设备与平台端交互能力边界。" },
   { field: "版本号", key: "versionNo", required: "是", rule: "表达该功能集能力迭代版本，建议 V1.0、V2.0。", example: "V1.0" },
-  { field: "版本名称", key: "versionName", required: "是", rule: "描述该版本支持的核心能力。", example: "仅 WiFi 设备交互版本" },
-  { field: "支持能力", key: "supportedCapability", required: "是", rule: "描述该版本支持的能力范围。", example: "仅 WiFi" },
-  { field: "版本描述", key: "description", required: "是", rule: "说明该版本支持什么设备类型以及交互边界。", example: "支持仅 WiFi 的设备与平台端进行基础交互。" }
+  { field: "版本名称", key: "versionName", required: "是", rule: "描述该版本对应的能力快照名称。", example: "仅 WiFi 设备交互版本" },
+  { field: "能力范围", key: "capabilityScope", required: "是", rule: "记录该版本覆盖的能力范围或适用能力值。", example: "仅 WiFi" },
+  { field: "版本描述", key: "description", required: "是", rule: "说明该版本的适用设备、交互范围和能力边界。", example: "支持仅 WiFi 的设备与平台端进行基础交互。" }
 ];
 
 const importTemplate = `JSON 格式:
@@ -178,7 +178,7 @@ const importTemplate = `JSON 格式:
         {
           "functionVersion": "V1.0",
           "versionName": "",
-          "supportedCapability": "",
+          "capabilityScope": "",
           "versionDescription": ""
         }
       ]
@@ -195,10 +195,10 @@ const prdSections = [
       {
         type: "definition",
         items: [
-          ["文档名称", "机型功能集版本管理平台产品需求文档（PRD）"],
+          ["文档名称", "机型功能集字典与版本记录平台产品需求文档（PRD）"],
           ["文档目的", "统一平台的背景、目标、范围、流程、功能需求、非功能需求与阶段规划。"],
           ["文档定位", "兼顾可评审与可汇报，既服务研发落地，也支撑平台立项与阶段规划沟通。"],
-          ["适用范围", "覆盖当前 MVP 功能集管理模块、一期平台建设范围及长期路线图。"] 
+          ["适用范围", "覆盖当前 MVP 功能集字典模块、一期平台建设范围及长期路线图。"] 
         ]
       }
     ]
@@ -213,7 +213,7 @@ const prdSections = [
         title: "当前主要问题",
         items: [
           "功能项已被维护，但产品承诺视角不足，难以形成完整可售卖、可交付的能力包。",
-          "功能项可以演进，但缺少功能集整体版本基线，无法回答某机型某版本到底支持什么。",
+          "功能项可以演进，但缺少功能集整体版本基线，无法回答某机型某版本到底具备哪些能力。",
           "数据维护动作已存在，但缺少从需求引入到发布追溯的完整流程闭环。",
           "角色协同不足，产品、研发、测试、售前、售后尚未统一到同一能力事实源。",
           "当前字段结构偏自然语言，长期难以支撑自动化测试、版本映射和依赖分析。"
@@ -245,7 +245,7 @@ const prdSections = [
         title: "成功指标",
         items: [
           ["MVP", "100% 的新建功能集与功能集版本通过平台录入；查询功能集到版本记录的平均操作路径不超过 3 步。"],
-          ["一期", "80% 以上的标准机型能力定义通过功能集版本管理；跨角色问题确认的人工确认次数明显下降。"],
+          ["一期", "80% 以上的标准机型能力定义通过功能集字典与版本记录沉淀；跨角色问题确认的人工确认次数明显下降。"],
           ["长期", "平台成为机型能力定义、版本映射与发布追溯的统一事实源。"]
         ]
       }
@@ -263,7 +263,7 @@ const prdSections = [
           {
             heading: "当前 MVP",
             items: [
-              "功能集列表展示与查询",
+              "功能集字典列表展示与查询",
               "新增、编辑、启停功能集",
               "功能集详情查看",
               "版本记录、操作日志、批量导入",
@@ -325,7 +325,7 @@ const prdSections = [
           "产品经理为新产品线定义功能集，并沉淀多个能力版本。",
           "研发确认某功能集在不同版本间的能力变化。",
           "测试根据某功能集版本确定当前测试范围。",
-          "售前确认某机型在某版本下是否支持某项能力。",
+          "售前确认某机型在某版本下的能力范围是什么。",
           "售后通过操作日志与版本记录回溯某次能力变更。"
         ]
       }
@@ -354,7 +354,7 @@ const prdSections = [
         title: "MVP 主流程",
         items: [
           "创建功能集并填写基础信息。",
-          "选择目标功能集进入版本管理。",
+          "选择目标功能集进入版本记录。",
           "创建版本草稿并保存。",
           "发布可引用版本。",
           "查看版本列表与日志记录。"
@@ -370,7 +370,7 @@ const prdSections = [
       {
         type: "diagram",
         title: "功能集创建与版本发布流程",
-        text: `[进入功能集管理页]
+        text: `[进入功能集字典页]
         |
         v
 [查看功能集列表]
@@ -389,7 +389,7 @@ const prdSections = [
         +-----------> [新增版本]
                            |
                            v
-               [填写版本号/版本名称/支持能力/版本描述]
+               [填写版本号/版本名称/能力范围/版本描述]
                            |
                   +--------+--------+
                   |                 |
@@ -410,7 +410,7 @@ const prdSections = [
       {
         type: "diagram",
         title: "查询流程",
-        text: `[进入功能集管理页]
+        text: `[进入功能集字典页]
         |
         v
 [在查询区输入名称/编码关键词]
@@ -418,7 +418,7 @@ const prdSections = [
         +----------------------+
         |                      |
         v                      v
-[点击搜索/按Enter]        [点击重置]
+[点击查询/按Enter]        [点击重置]
         |                      |
         v                      v
 [筛选左侧功能集列表]      [恢复全部列表]
@@ -461,7 +461,7 @@ const prdSections = [
         type: "functional-groups",
         groups: [
           {
-            title: "模块一：功能集管理",
+            title: "模块一：功能集字典",
             items: [
               ["功能集列表", "展示功能集名称、编码、状态、版本记录数量、最新版本号；点击列表项联动右侧详情。"],
               ["功能集查询", "支持按功能集名称和编码查询；点击查询或按 Enter 执行；点击重置恢复全部列表。"],
@@ -471,10 +471,10 @@ const prdSections = [
             ]
           },
           {
-            title: "模块二：功能集版本管理",
+            title: "模块二：版本记录",
             items: [
-              ["版本记录列表", "展示版本号、版本名称、支持能力、版本描述、状态、发布时间和操作。"],
-              ["新增版本", "通过弹窗录入版本号、版本名称、支持能力和版本描述。"],
+              ["版本记录列表", "展示版本号、版本名称、能力范围、版本描述、状态、发布时间和操作。"],
+              ["新增版本", "通过弹窗录入版本号、版本名称、能力范围和版本描述。"],
               ["保存草稿", "允许先保存为草稿，后续再发布。"],
               ["发布版本", "将版本草稿发布为正式版本，并写入发布时间。"],
               ["查看与编辑版本", "支持只读查看与编辑修改；已发布版本也可继续编辑。"],
@@ -535,7 +535,7 @@ const prdSections = [
         title: "当前 MVP 核心对象",
         items: [
           ["功能集 FeatureSet", "id、name、code、status、description、createdAt、updatedAt"],
-          ["功能集版本 FeatureSetVersion", "id、featureSetId、versionNo、versionName、supportedCapability、description、status、publishedAt、createdAt"],
+          ["功能集版本 FeatureSetVersion", "id、featureSetId、versionNo、versionName、capabilityScope、description、status、publishedAt、createdAt"],
           ["操作日志 OperationLog", "id、featureSetId、action、target、operator、operatedAt、result"]
         ]
       },
@@ -622,8 +622,8 @@ const prdSections = [
         type: "timeline",
         title: "阶段路线图",
         items: [
-          ["MVP", "完成功能集管理、版本记录、操作日志、批量导入、查询、字段规范与流程说明的最小治理闭环。"],
-          ["一期", "补齐功能项字典、功能集与功能项关系、版本状态机、评审冻结、引用校验和历史版本对比。"],
+          ["MVP", "完成功能集字典、版本记录、操作日志、批量导入、查询、字段规范与流程说明的最小治理闭环。"],
+          ["一期", "补齐功能项字典、功能集与功能项关系、版本状态机、评审冻结、引用校验和历史版本对比，升级为可治理的能力治理平台。"],
           ["二期", "扩展机型功能集绑定、SKU/区域/项目关联及软件版本映射。"],
           ["三期", "建设测试与验收、审批与审计、多机型对比和项目定制转标准能力治理。"]
         ]
@@ -735,7 +735,7 @@ const annotationItems = [
     scene: "用于在当前功能集下沉淀新的能力快照，适合新增迭代版本或补录历史版本。",
     title: "新增版本",
     trigger: "点击“新增版本”按钮。",
-    fields: "版本号、版本名称、支持能力、版本描述。",
+    fields: "版本号、版本名称、能力范围、版本描述。",
     interaction: "点击后打开版本弹窗，可选择先保存草稿，也可直接发布。",
     result: "字段全部必填；保存后形成草稿版本；发布后形成正式版本并写入发布时间。"
   },
@@ -745,7 +745,7 @@ const annotationItems = [
     scene: "用于对已有版本记录进行查看、修订、发布或清理，适合版本治理和历史维护场景。",
     title: "版本操作列",
     trigger: "在版本列表操作列中点击查看、编辑、发布、删除。",
-    fields: "当前操作基于已有版本记录，不新增字段；编辑时可修改版本号、版本名称、支持能力、版本描述。",
+    fields: "当前操作基于已有版本记录，不新增字段；编辑时可修改版本号、版本名称、能力范围、版本描述。",
     interaction: "已发布版本支持查看和编辑；草稿版本支持编辑、发布与删除；不同状态显示不同操作集合。",
     result: "已发布版本不可直接删除；草稿版本可删除；发布后版本状态更新为已发布并写入发布时间。"
   },
@@ -755,7 +755,7 @@ const annotationItems = [
     scene: "适用于历史数据初始化、批量迁移或一次性补录多个功能集及版本的场景。",
     title: "批量导入",
     trigger: "点击页面右上角“批量导入”按钮。",
-    fields: "功能集编码、功能集名称、功能集状态、功能集说明，以及版本号、版本名称、支持能力、版本描述。",
+    fields: "功能集编码、功能集名称、功能集状态、功能集说明，以及版本号、版本名称、能力范围、版本描述。",
     interaction: "点击后打开导入弹窗，查看 JSON 模板说明并提交导入任务。",
     result: "需按模板结构准备数据；当前原型阶段提交后反馈任务已提交，后续可继续扩展真实导入校验。"
   }
@@ -828,7 +828,7 @@ function renderNav() {
 }
 
 function render() {
-  els.title.textContent = navItems.find((item) => item.id === activePage)?.label || "功能集管理";
+  els.title.textContent = navItems.find((item) => item.id === activePage)?.label || "功能集字典";
   renderTopActions();
   if (activePage !== "featureSets") closeDrawer();
   if (activePage === "featureSets") renderFeatureSets();
@@ -938,12 +938,12 @@ function renderGuide() {
       <div class="card-header guide-header">
         <div>
           <h3>流程与交互说明</h3>
-          <p>本页用于说明功能集管理模块在当前 MVP 阶段的使用路径、模块职责以及与后续平台规划之间的承接关系。</p>
+          <p>本页用于说明功能集字典模块在当前 MVP 阶段的使用路径、模块职责以及与后续平台规划之间的承接关系。</p>
         </div>
       </div>
       <div class="guide-hero-body">
         ${guideHighlight("当前定位", "作为机型能力治理的 MVP 工作台，先完成“定义功能集 - 维护版本 - 留痕追溯”的最小闭环。")}
-        ${guideHighlight("当前覆盖", "功能集管理、版本记录、操作日志、批量导入、字段规范与名称/编码查询。")}
+        ${guideHighlight("当前覆盖", "功能集字典、版本记录、操作日志、批量导入、字段规范与名称/编码查询。")}
         ${guideHighlight("后续承接", "未来可继续扩展机型绑定、软件版本映射、测试验收和跨角色审批，但本轮先用说明页完成关系表达。")}
       </div>
     </section>
@@ -958,7 +958,7 @@ function renderGuide() {
         </div>
         <div class="flow-steps">
           ${flowStep("01", "定义功能集", "产品或平台运营新建功能集，明确名称、编码、状态和边界说明，形成一个可持续维护的能力容器。")}
-          ${flowStep("02", "维护版本草稿", "在对应功能集下新增版本，填写版本号、版本名称、支持能力和版本描述，先保存为草稿。")}
+          ${flowStep("02", "维护版本草稿", "在对应功能集下新增版本，填写版本号、版本名称、能力范围和版本描述，先保存为草稿。")}
           ${flowStep("03", "发布可引用版本", "确认能力范围后发布版本，形成可对外引用的能力快照，同时记录发布时间。")}
           ${flowStep("04", "查看操作留痕", "通过操作日志查看创建、保存、发布等关键动作，为后续问题定位和版本回溯提供依据。")}
           ${flowStep("05", "批量导入补录", "对于历史能力或成批迁移场景，可通过模板一次性导入功能集及版本数据。")}
@@ -974,7 +974,7 @@ function renderGuide() {
           </div>
         </div>
         <div class="guide-blocks">
-          ${guideBlock("功能集管理", [
+          ${guideBlock("功能集字典", [
             "用于进行日常操作，主路径是查询功能集、查看详情、维护版本和查看日志。",
             "功能集负责表达能力边界，不直接承载某一版的具体能力值。",
             "版本记录负责沉淀某一时间点可被引用的能力快照。"
@@ -1002,8 +1002,8 @@ function renderGuide() {
       </div>
       <div class="interaction-grid">
         ${interactionCard("功能集查询", [
-          "查询位置在功能集管理说明下方，只支持按功能集名称和功能集编码检索。",
-          "输入关键词后点击搜索或按 Enter 执行查询，点击重置恢复全部列表。",
+          "查询位置在功能集字典说明下方，只支持按功能集名称和功能集编码检索。",
+          "输入关键词后点击查询或按 Enter 执行查询，点击重置恢复全部列表。",
           "若当前选中项仍在结果中，右侧详情保持；若被筛掉，则自动切换到第一条匹配结果。"
         ])}
         ${interactionCard("新增/编辑功能集", [
@@ -1037,7 +1037,7 @@ function renderGuide() {
           <span>当前 MVP 承接方式</span>
         </div>
         ${planningRow("机型功能集绑定", "当前先用功能集 + 版本快照表达能力基线，后续再将功能集版本与机型、SKU、区域、项目建立绑定关系。")}
-        ${planningRow("软件版本映射", "当前只管理能力定义和版本发布，后续可补充固件、App、云平台、算法包的实现版本映射。")}
+        ${planningRow("软件版本映射", "当前先维护能力定义和版本发布信息，后续可补充固件、App、云平台、算法包的实现版本映射。")}
         ${planningRow("测试与验收", "当前通过版本记录和操作日志保留发布依据，后续可继续扩展测试范围、用例和验收结论。")}
         ${planningRow("审批与审计", "当前保留操作日志作为留痕基础，后续可增加评审、冻结、发布审批和引用校验。")}
       </div>
@@ -1050,7 +1050,7 @@ function renderPrd() {
     <section class="page-card prd-hero">
       <div class="card-header prd-hero-header">
         <div>
-          <h3>机型功能集版本管理平台产品需求文档（PRD）</h3>
+          <h3>机型功能集字典与版本记录平台产品需求文档（PRD）</h3>
           <p>本页将完整 PRD 同步进平台内，供研发、测试、产品、交付等角色直接按章节查阅，不必在页面原型与外部文档之间来回切换。</p>
         </div>
         <div class="prd-hero-meta">
@@ -1099,7 +1099,7 @@ function renderStandards() {
       </div>
       <div class="principle-grid">
         ${principle("功能集描述边界", "功能集只维护名称、编码、状态和说明，用于表达能力边界。")}
-        ${principle("版本沉淀能力", "版本记录只维护版本号、版本名称、支持能力和版本描述，用于沉淀能力迭代。")}
+        ${principle("版本沉淀能力", "版本记录只维护版本号、版本名称、能力范围和版本描述，用于沉淀能力迭代。")}
         ${principle("发布明确可用性", "版本通过保存与发布两种操作区分草稿和可引用记录。")}
       </div>
       ${standardsTable()}
@@ -1220,7 +1220,7 @@ function versionTable(rows) {
           <tr>
             <th>版本号</th>
             <th>版本名称</th>
-            <th>支持能力</th>
+            <th>能力范围</th>
             <th>版本描述</th>
             <th>状态</th>
             <th>发布时间</th>
@@ -1234,7 +1234,7 @@ function versionTable(rows) {
                 <tr>
                   <td><strong>${item.versionNo}</strong></td>
                   <td>${item.versionName}</td>
-                  <td>${item.supportedCapability}</td>
+                  <td>${item.capabilityScope}</td>
                   <td>${item.description}</td>
                   <td>${statusTag(item.status)}</td>
                   <td>${item.publishedAt ? `${item.publishedAt} 00:00:00` : "-"}</td>
@@ -1617,14 +1617,14 @@ function openFeatureSetForm(item = {}) {
     <div class="modal-shell">
       <div class="drawer-title-block">
         <h3>${title}</h3>
-        <p>功能集用于定义稳定能力边界；具体支持哪些能力，放到版本里维护。</p>
+        <p>功能集用于定义稳定能力边界；具体能力范围和版本快照在版本记录中维护。</p>
       </div>
       <form class="form-grid" id="featureSetForm">
         ${formInput("功能集名称", "name", item.name || "", "例如：网络类型功能集", true)}
         ${formInput("功能集编码", "code", item.code || "", "例如：network_type", true)}
         ${formToggle("功能集状态", "status", item.status || "启用")}
-        ${formTextarea("功能集说明", "description", item.description || "", "说明该功能集管理的能力集合和边界", true)}
-        <div class="form-help form-wide">填写建议：功能集用于描述能力范围和边界，不承载具体版本能力。</div>
+        ${formTextarea("功能集说明", "description", item.description || "", "说明该功能集覆盖的能力范围、适用场景和边界", true)}
+        <div class="form-help form-wide">填写建议：功能集用于描述稳定能力边界，不承载某一版本的具体能力范围。</div>
         <div class="drawer-actions">
           <button class="ghost-action" type="button" data-modal-action="close">取消</button>
           <button class="primary-action" type="button" data-action="save-set" data-id="${item.id || ""}">保存功能集</button>
@@ -1664,16 +1664,16 @@ function openVersionForm(item = {}, readOnly = false) {
     <div class="modal-shell">
       <div class="drawer-title-block">
         <h3>${title}</h3>
-        <p>${readOnly ? "查看当前版本记录。" : `当前所属功能集：${currentSet.name}`}</p>
+        <p>${readOnly ? "查看当前版本记录。" : `当前归属功能集：${currentSet.name}`}</p>
       </div>
       <form class="form-grid ${readOnly ? "readonly-form" : ""}" id="versionForm">
         <input type="hidden" name="featureSetId" value="${currentSet.id}" />
         ${formInput("版本号", "versionNo", item.versionNo || nextVersionNo(currentSet.id), "例如：V1.0", true, readOnly)}
         ${formInput("版本名称", "versionName", item.versionName || "", "例如：仅 WiFi 设备交互版本", true, readOnly)}
-        ${formInput("支持能力", "supportedCapability", item.supportedCapability || "", "例如：仅 WiFi", true, readOnly)}
+        ${formInput("能力范围", "capabilityScope", item.capabilityScope || "", "例如：仅 WiFi", true, readOnly)}
         <span class="form-placeholder" aria-hidden="true"></span>
-        ${formTextarea("版本描述", "description", item.description || "", "说明该版本支持什么能力及交互边界", true, readOnly)}
-        <div class="form-help form-wide">填写建议：版本记录用于沉淀当前功能集下的具体能力内容，发布后可视为正式版本。</div>
+        ${formTextarea("版本描述", "description", item.description || "", "说明该版本的适用设备、交互范围和能力边界", true, readOnly)}
+        <div class="form-help form-wide">填写建议：版本记录用于沉淀当前功能集下的能力范围和交互边界，发布后可视为正式版本快照。</div>
         <div class="drawer-actions">
           <button class="ghost-action" type="button" data-modal-action="close">${readOnly ? "关闭" : "取消"}</button>
           ${
@@ -1723,8 +1723,8 @@ function saveFeatureSet(id) {
 function saveVersion(id, mode = "save") {
   const form = $("#versionForm");
   const data = Object.fromEntries(new FormData(form).entries());
-  if (!data.featureSetId || !data.versionNo || !data.versionName || !data.supportedCapability || !data.description) {
-    showToast("请补全版本号、版本名称、支持能力和版本描述", "error");
+  if (!data.featureSetId || !data.versionNo || !data.versionName || !data.capabilityScope || !data.description) {
+    showToast("请补全版本号、版本名称、能力范围和版本描述", "error");
     return;
   }
 
@@ -1749,7 +1749,7 @@ function saveVersion(id, mode = "save") {
       featureSetId: data.featureSetId,
       versionNo: data.versionNo,
       versionName: data.versionName,
-      supportedCapability: data.supportedCapability,
+      capabilityScope: data.capabilityScope,
       description: data.description,
       status: nextStatus,
       publishedAt,
